@@ -17,7 +17,12 @@ export default defineConfig({
         target: "https://accounts.google.com/o/oauth2/v2",
         changeOrigin: true,
         secure: false,
-      }
+      },
+      '/v1': {
+        target: 'https://kapi.kakao.com',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 
