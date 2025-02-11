@@ -1,1 +1,1 @@
-export { default as HOME_ROUTES } from "./HOME_ROUTES";
+export { default as LOGIN_ROUTES } from "./LOGIN_ROUTES";
