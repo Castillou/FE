@@ -1,16 +1,15 @@
-import KakaoTest from "@/KakaoTest";
-import Oauth from "@/oauth";
+import RootLayout from "@/layouts/RootLayout";
 import { createBrowserRouter } from "react-router-dom";
+import { HOME_ROUTES } from "./route";
 
 const router = createBrowserRouter([
-	{
-		path: "/",
-		element: <KakaoTest />
-	},
-	{
-		path: "/oauth",
-		element: <Oauth />,
-	},
+  {
+    path: "/",
+    element: <RootLayout />,
+    // loader: tokenLoader,
+    errorElement: <p style={{ textAlign: "center" }}>404</p>,
+    children: [...HOME_ROUTES],
+  },
 ]);
 
 export default router;
