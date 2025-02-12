@@ -8,6 +8,16 @@ import { Reservation } from "@/types/apiTypes";
 import dayjs from "dayjs";
 import ReservationItem from "./components/ReservationItem";
 import { formatDate } from "@/utils/dayFormat";
+import { Button } from "@/components/ui/button";
+
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import DesignerFilterDrawer from "./components/DesignerFilterDrawer";
 
 const DesignerListPage = () => {
   const { data: designerData, isPending: designerPending } = useQuery({
@@ -53,7 +63,24 @@ const DesignerListPage = () => {
           <div>Loading...</div>
         ) : (
           <div className="w-full p-1">
-            <DesignerList designers={designerData} />
+            <Drawer>
+              <div className="w-full flex justify-end mb-8 px-4">
+                <DrawerTrigger>
+                  <Button>필터</Button>
+                </DrawerTrigger>
+              </div>
+
+              <DesignerList designers={designerData} />
+
+              <DrawerContent>
+                <DesignerFilterDrawer />
+                <DrawerFooter>
+                  <DrawerClose>
+                    <Button variant="outline">Cancel</Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
           </div>
         )}
       </div>
