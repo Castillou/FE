@@ -1,9 +1,5 @@
 const Footer = () => {
-	return (
-		<div className="h-[90px] bg-slate-500 mt-2">
-			푸터 영역입니다.
-		</div>
-	)
-}	
+  return <footer className="sticky bottom-0 w-full h-16 bg-gray-scale-200 mt-2"></footer>;
+};
 
 export default Footer;

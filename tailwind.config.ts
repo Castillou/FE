@@ -16,6 +16,9 @@ export default {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
+        red: {
+          "500": "#DC3644",
+        },
         info: {
           "500": "#1A9EFE",
         },
