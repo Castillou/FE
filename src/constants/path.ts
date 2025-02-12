@@ -6,8 +6,9 @@ export const PATH = {
   signUp: "/sign-up",
   logout: "/logout",
   oauthRedirect: "/oauth-redirect",
-  mypage: "/mypage",
-  reservedList: "/mypage/reserved-list",
+  reservationList: "/reservation-list",
   designerList: "/designer-list",
-  designerDetail: (id: string) => `/mypage/designer/${id}`,
+  payments: "/payments",
+  designerDetail: (id: string) => `/designer/${id}`,
+  reservationDetail: (id: string) => `/reservation/${id}`,
 };
