@@ -1,5 +1,5 @@
 import { PATH } from "@/constants/path";
-import DesignerListPage from "@/pages/DesignerListPage";
+import { DesignerListPage } from "@/pages";
 
 const DESIGNER_ROUTES = [
   {

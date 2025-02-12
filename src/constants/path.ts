@@ -11,4 +11,5 @@ export const PATH = {
   payments: "/payments",
   designerDetail: (id: string) => `/designer/${id}`,
   reservationDetail: (id: string) => `/reservation/${id}`,
+  reservationDetailPath: "/reservation/:id",
 };

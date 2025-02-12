@@ -1,5 +1,5 @@
 import { PATH } from "@/constants/path";
-import PaymentPage from "@/pages/PaymentPage";
+import { PaymentPage } from "@/pages";
 
 const PAYMENTS_ROUTES = [
   {

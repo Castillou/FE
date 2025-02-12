@@ -1,10 +1,14 @@
 import { PATH } from "@/constants/path";
-import ReservationListPage from "@/pages/ReservationListPage";
+import { ReservationListPage, ReservationDetailPage } from "@/pages";
 
 const RESERVATION_ROUTES = [
   {
     path: PATH.reservationList,
     element: <ReservationListPage />,
+  },
+  {
+    path: PATH.reservationDetailPath,
+    element: <ReservationDetailPage />,
   },
 ];
 
