@@ -1,5 +1,5 @@
 export interface Designer {
-  _id: string;
+  id: string;
   name: string;
   region: string;
   specialties: string;

@@ -1,9 +1,9 @@
 import { RESERVATION_ENDPOINT } from "./endpoints";
 import devApi from "@/config/axiosDevConfig";
 
-export const getReservationList = async (user_id: string) => {
+export const reservationCancel = async (reservation_id: string) => {
   try {
-    const response = await devApi.get(RESERVATION_ENDPOINT.get_list(user_id));
+    const response = await devApi.get(RESERVATION_ENDPOINT.cancel(reservation_id));
     return response.data;
   } catch (error) {
     console.error(error);

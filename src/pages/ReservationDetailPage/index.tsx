@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import ReservationInfo from "./components/ReservationInfo";
 import ImageSection from "./components/ImageSection";
 
-const reservation_id = "67ab4a87e38533dcf975950f";
+const reservation_id = "67ab4a82e38533dcf975950e";
 
 const ReservationDetailPage = () => {
   const { data, isPending, isError } = useQuery({
@@ -32,6 +32,7 @@ const ReservationDetailPage = () => {
   }
 
   if (data) {
+    console.log(data);
     content = (
       <>
         <ImageSection />
