@@ -36,7 +36,7 @@ const ReservationListPage = () => {
 
   return (
     <div className="pb-24">
-      <h2 className="pt-4 px-5 text-xl font-bold mb-2">예약 내역</h2>
+      <h2 className="pt-4 px-5 text-xl font-bold mb-4">예약 내역</h2>
       {content}
       <Footer />
     </div>

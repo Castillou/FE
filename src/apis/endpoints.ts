@@ -16,6 +16,11 @@ interface DesignerEndpoint {
   get_detail: (designer_id: string) => string;
 }
 
+interface MypageEndpoint {
+  me: string;
+  email: (email: string) => string;
+}
+
 /**
 # ======================#
 |       RESERVATION     |
@@ -38,13 +43,17 @@ export const RESERVATION_ENDPOINT: ReservationEndpoint = Object.freeze({
 
 export const DESIGNER_ENDPOINT: DesignerEndpoint = Object.freeze({
   designers: `/designers`,
-  get_detail: (designer_id: string) => `/designers?designer_id=${designer_id}`, // 디자이너 상세 정보 조회
+  get_detail: (designer_id: string) => `/designers/${designer_id}`, // 디자이너 상세 정보 조회
 });
 
 /**
 # ======================#
-|          AUTH         |
+|         MYPAGE        |
 # ======================#
 */
 
-// export const AUTH_ENDPOINT: DesignerEndpoint = Object.freeze({});
+export const MYPAGE_ENDPOINT: MypageEndpoint = Object.freeze({
+  me: "/user/me",
+  email: (email: string) => `/user/${email}`, // 디자이너 상세 정보
+  delete: "/user/delete",
+});

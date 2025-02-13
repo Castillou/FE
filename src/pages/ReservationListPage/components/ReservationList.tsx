@@ -1,3 +1,4 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Reservation } from "@/types/apiTypes";
 import ReservationItem from "./ReservationItem";
 
@@ -13,27 +14,28 @@ const ReservationList = ({ list }: ReservationListProps) => {
   const canceledReservations = list.filter((reservation) => reservation.status === "예약취소");
 
   return (
-    <div className="flex flex-col gap-8 px-4">
-      {/* 예약완료 리스트 */}
-      <div>
-        <h2 className="text-md font-semibold pl-2 text-gray-scale-400 mb-3">예약완료</h2>
+    <Tabs defaultValue="completed" className="w-full px-4">
+      <TabsList className="grid w-full grid-cols-2 mb-4">
+        <TabsTrigger value="completed">예약완료</TabsTrigger>
+        <TabsTrigger value="canceled">예약취소</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="completed">
         <ul className="flex flex-col gap-4">
           {completedReservations.map((reservation) => (
             <ReservationItem key={reservation.id} reservation={reservation} />
           ))}
         </ul>
-      </div>
+      </TabsContent>
 
-      {/* 예약취소 리스트 */}
-      <div>
-        <h2 className="text-md font-semibold pl-2 text-gray-scale-400 mb-3">예약취소</h2>
+      <TabsContent value="canceled">
         <ul className="flex flex-col gap-4">
           {canceledReservations.map((reservation) => (
             <ReservationItem key={reservation.id} reservation={reservation} />
           ))}
         </ul>
-      </div>
-    </div>
+      </TabsContent>
+    </Tabs>
   );
 };
 

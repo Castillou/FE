@@ -14,4 +14,6 @@ export const PATH = {
   reservationDetailPath: "/reservation/:id",
 
   payments: "/payments",
+
+  mypage: "/mypage",
 };
