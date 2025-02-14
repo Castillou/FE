@@ -2,9 +2,6 @@
 export const PATH = {
   login: "/",
   logout: "/logout",
-  // authCallback: "/auth/callback",
-  authSuccess: "/success",
-  authError: "/error",
 
   designerList: "/designer-list",
   designerDetail: (id: string) => `/designer/${id}`,

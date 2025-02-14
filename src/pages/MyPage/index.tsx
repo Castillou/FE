@@ -3,6 +3,7 @@ import QUERY_KEY from "@/constants/queryKey";
 import { useQuery } from "@tanstack/react-query";
 import ProfileInfo from "./components/ProfileInfo";
 import Header from "@/components/common/Header";
+import ButtonSection from "./components/ButtonSection";
 
 const email = "joajoa70584@gmail.com";
 
@@ -39,6 +40,7 @@ const MyPage = () => {
       <>
         <Header />
         <ProfileInfo user={user} />
+        <ButtonSection />
       </>
     );
   }
