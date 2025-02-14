@@ -1,6 +1,6 @@
 // TODO: 임의로 정한 경로이기 떄문에 회의 후 정 계획
 export const PATH = {
-  login: "/",
+  login: "/login",
   logout: "/logout",
 
   designerList: "/designer-list",
