@@ -38,7 +38,17 @@ const PaymentPage = () => {
       localStorage.setItem('tid', readyResponse.tid);
       localStorage.setItem('order_id', readyResponse.payment_id);
 
-      window.location.href = readyResponse.next_redirect_pc_url;
+      // 모바일 디바이스 체크
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+
+      // 디바이스 타입에 따라 적절한 URL 선택
+      const redirectUrl = isMobile 
+        ? readyResponse.next_redirect_mobile_url 
+        : readyResponse.next_redirect_pc_url;
+
+      window.location.href = redirectUrl;
     } catch (error) {
       setError(`결제 준비 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
     } finally {
