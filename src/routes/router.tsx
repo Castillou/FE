@@ -1,20 +1,37 @@
 import RootLayout from "@/layouts/RootLayout";
+import HomeLayout from "@/layouts/HomeLayout";
 import { createBrowserRouter } from "react-router-dom";
-import { LOGIN_ROUTES, DESIGNER_ROUTES, PAYMENTS_ROUTES, RESERVATION_ROUTES } from "./route";
-import MYPAGE_ROUTES from "./route/MYPAGE_ROUTES";
+import { ErrorPage } from "@/pages";
+import {
+  LOGIN_ROUTES,
+  DESIGNER_ROUTES,
+  PAYMENTS_ROUTES,
+  RESERVATION_ROUTES,
+  MYPAGE_ROUTES,
+} from "./route";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
-    // loader: tokenLoader,
-    errorElement: <p style={{ textAlign: "center" }}>404</p>,
+    errorElement: <ErrorPage />,
     children: [
       ...LOGIN_ROUTES,
-      ...DESIGNER_ROUTES,
-      ...PAYMENTS_ROUTES,
-      ...RESERVATION_ROUTES,
-      ...MYPAGE_ROUTES,
+      {
+        path: "/",
+        element: <HomeLayout />,
+        children: [
+          {
+            path: "/",
+            children: [
+              ...DESIGNER_ROUTES,
+              ...PAYMENTS_ROUTES,
+              ...RESERVATION_ROUTES,
+              ...MYPAGE_ROUTES,
+            ],
+          },
+        ],
+      },
     ],
   },
 ]);
