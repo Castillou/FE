@@ -7,6 +7,7 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Check } from "lucide-react";
+import axios from "axios";
 
 interface PaymentInfo {
   amount: number;
@@ -49,6 +50,7 @@ const PaymentSuccessPage = () => {
         }
 
         try {
+          // 결제 승인 처리
           const response = await paymentApi.approve({
             tid,
             pg_token,
@@ -57,13 +59,32 @@ const PaymentSuccessPage = () => {
 
           localStorage.removeItem("tid");
           localStorage.removeItem("order_id");
+
+          // /reservation/create 엔드포인트 호출
+          const createPayload = {
+            reservation_id: "67b1e3299c941b90f4ffd518",
+            designer_id: "67ab727934cd2146254af06a",
+            user_id: "67b1e2959c941b90f4ffd517",
+            reservation_date_time: "202503181900",
+            consulting_fee: "30000",
+            google_meet_link: "",
+            mode: "비대면",
+            status: "예약완료"
+          };
+
+          const reservationResponse = await axios.post("https://harmari.duckdns.org/reservation/create", createPayload);
+          console.log("Reservation created:", reservationResponse.data);
+          
           setLoading(false);
-          setPaymentInfo(response);
+    
+          setPaymentInfo({ ...response});
+
+          // reservation 생성이 성공하면 success 페이지로 이동
         } catch (err: unknown) {
           if (err instanceof AxiosError) {
-            setError(err.response?.data?.detail || "결제 승인 중 오류가 발생했습니다.");
+            setError(err.response?.data?.detail || "결제 승인 또는 예약 생성 중 오류가 발생했습니다.");
           } else {
-            setError("결제 승인 중 오류가 발생했습니다.");
+            setError("결제 승인 또는 예약 생성 중 오류가 발생했습니다.");
           }
           setLoading(false);
         }
