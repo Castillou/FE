@@ -2,7 +2,9 @@ import { getDesignerList } from "@/apis/designerList";
 import QUERY_KEY from "@/constants/queryKey";
 import { useQuery } from "@tanstack/react-query";
 import DesignerList from "./components/DesignerList/DesignerList";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 import { DesignerFilterMode, DesignerLocation, FilterOptions } from "@/types/types";
 import FilteredOptionBox from "./components/DesignerFilter/FilteredOptionBox";
@@ -16,6 +18,21 @@ const DesignerListPage = () => {
     designer_mode: undefined,
     designer_location: ["서울 전체"],
   });
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+    if (accessToken && refreshToken) {
+      Cookies.set("access_token", accessToken, { secure: true, sameSite: "strict" });
+      Cookies.set("refresh_token", refreshToken, { secure: true, sameSite: "strict" });
+      // Remove tokens from URL after storing in cookies
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate]);
 
   // 모드 필터링 체크 함수
   const handleModeChange = (mode: DesignerFilterMode) => {
