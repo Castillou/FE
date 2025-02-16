@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, ChangeEvent } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { paymentApi } from "../../services/paymentApi";
 import { PATH } from "@/constants/path";
@@ -16,6 +16,17 @@ interface PaymentInfo {
   user_id: string;
 }
 
+interface ReservationPayload {
+  reservation_id: string;
+  designer_id: string;
+  user_id: string;
+  reservation_date_time: string;
+  consulting_fee: string;
+  google_meet_link: string;
+  mode: string;
+  status: string;
+}
+
 const PaymentSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -24,8 +35,48 @@ const PaymentSuccessPage = () => {
   const [paymentInfo, setPaymentInfo] = useState<PaymentInfo | null>(null);
   const isProcessingRef = useRef(false);
 
+  // Reservation 생성용 폼 상태 (기본값은 고정값)
+  const [reservationPayload, setReservationPayload] = useState<ReservationPayload>({
+    reservation_id: "67b1e3299c941b90f4ffd518",
+    designer_id: "67ab727934cd2146254af06a",
+    user_id: "67b1e2959c941b90f4ffd517",
+    reservation_date_time: "202503181900",
+    consulting_fee: "30000",
+    google_meet_link: "",
+    mode: "비대면",
+    status: "예약완료"
+  });
+
+  // input change handler
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setReservationPayload((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // 예약 생성 API 호출 함수
+  const handleCreateReservation = async () => {
+    try {
+      setLoading(true);
+      const reservationResponse = await axios.post("https://harmari.duckdns.org/reservation/create", reservationPayload);
+      console.log("Reservation created:", reservationResponse.data);
+      // 예약 생성 후 success 페이지 처리는 이미 이 페이지 내에서 보여주고 있으므로
+      // 추가로 navigate 처리할 필요가 없을 수 있습니다.
+      setLoading(false);
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.detail || "예약 생성 중 오류가 발생했습니다.");
+      } else {
+        setError("예약 생성 중 오류가 발생했습니다.");
+      }
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // 개발 테스트용 URL인 경우 mock 데이터 사용
+// 개발 테스트용 URL인 경우 mock 데이터 사용
     // if (window.location.pathname === '/payment/success-test') {
     //   setPaymentInfo({
     //     amount: 40000,
@@ -60,31 +111,15 @@ const PaymentSuccessPage = () => {
           localStorage.removeItem("tid");
           localStorage.removeItem("order_id");
 
-          // /reservation/create 엔드포인트 호출
-          const createPayload = {
-            reservation_id: "67b1e3299c941b90f4ffd518",
-            designer_id: "67ab727934cd2146254af06a",
-            user_id: "67b1e2959c941b90f4ffd517",
-            reservation_date_time: "202503181900",
-            consulting_fee: "30000",
-            google_meet_link: "",
-            mode: "비대면",
-            status: "예약완료"
-          };
+          // 결제 승인 응답을 이용해 paymentInfo 상태 설정
+          setPaymentInfo({ ...response });
 
-          const reservationResponse = await axios.post("https://harmari.duckdns.org/reservation/create", createPayload);
-          console.log("Reservation created:", reservationResponse.data);
-          
           setLoading(false);
-    
-          setPaymentInfo({ ...response});
-
-          // reservation 생성이 성공하면 success 페이지로 이동
         } catch (err: unknown) {
           if (err instanceof AxiosError) {
-            setError(err.response?.data?.detail || "결제 승인 또는 예약 생성 중 오류가 발생했습니다.");
+            setError(err.response?.data?.detail || "결제 승인 처리 중 오류가 발생했습니다.");
           } else {
-            setError("결제 승인 또는 예약 생성 중 오류가 발생했습니다.");
+            setError("결제 승인 처리 중 오류가 발생했습니다.");
           }
           setLoading(false);
         }
@@ -102,7 +137,7 @@ const PaymentSuccessPage = () => {
   }, [searchParams]);
 
   if (loading) {
-    return <div className="text-center p-8">결제 승인 처리 중...</div>;
+    return <div className="text-center p-8">처리 중...</div>;
   }
 
   if (error) {
@@ -117,7 +152,7 @@ const PaymentSuccessPage = () => {
         <h1 className="text-lg font-medium">예약이 완료되었습니다.</h1>
       </div>
 
-      {/* 예약 정보 */}
+      {/* 예약 정보 (paymentApi.approve 응답 기준) */}
       <Card className="border-0 shadow-none px-6">
         <CardContent className="p-4">
           <div className="space-y-4">
@@ -125,26 +160,11 @@ const PaymentSuccessPage = () => {
               <span className="text-[14px] text-gray-400 w-24">예약 번호</span>
               <span className="text-gray-700">{paymentInfo?.reservation_id}</span>
             </div>
-
-            <div className="flex">
-              <span className="text-[14px] text-gray-400 w-24">날짜/시간</span>
-              <span className="text-gray-700">2025년 2월 21일 오전 11:30</span>
-            </div>
-
-            <div className="flex">
-              <span className="text-[14px] text-gray-400 w-24">매장/담당</span>
-              <span className="text-gray-700">헤어디너 컨설스토리점</span>
-            </div>
-
-            <div className="flex">
-              <span className="text-[14px] text-gray-400 w-24">컨설팅 방식</span>
-              <span className="text-gray-700">대면</span>
-            </div>
-
             <div className="flex">
               <span className="text-[14px] text-gray-400 w-24">예약자</span>
               <span className="text-gray-700">{paymentInfo?.user_id || "사용자"}</span>
             </div>
+            {/* 추가 정보는 필요에 따라 렌더링 */}
           </div>
         </CardContent>
       </Card>
@@ -159,7 +179,7 @@ const PaymentSuccessPage = () => {
         <CardContent className="p-4 space-y-4">
           <div className="flex">
             <span className="text-[14px] text-gray-400 w-24">결제 금액</span>
-            <span className="text-gray-700">{paymentInfo?.amount.toLocaleString()}원</span>
+            <span className="text-gray-700">{paymentInfo?.amount?.toLocaleString()}원</span>
           </div>
           <div className="flex">
             <span className="text-[14px] text-gray-400 w-24">결제 시간</span>
@@ -170,46 +190,108 @@ const PaymentSuccessPage = () => {
         </CardContent>
       </Card>
 
-      {/* 광고 배너 - 티켓 스타일 */}
-      <div className="px-4 mt-6">
-        <div className="bg-black p-4 pt-5 pb-2 rounded-lg">
-          <div className="text-white text-sm mb-3 text-center">
-            쿠폰받고 헤르츠 특별 컨설팅도 이용해보세요!
-          </div>
+      <Separator className="my-4" />
 
-          <div className="bg-[#FFD700] p-3 rounded-lg relative overflow-hidden w-[85%] mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-black text-lg font-bold">~17,000</span>
-                <div className="text-[10px] text-gray-700 mt-1">
-                  첫 결제 고객님을 위한 특별 할인
-                  <br />
-                  즉시할인/쿠폰혜택 안내
-                </div>
-              </div>
-              {/* 다운로드 아이콘 */}
-              <svg
-                className="w-5 h-5 text-black"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                />
-              </svg>
-            </div>
-            {/* 티켓 스타일을 위한 원형 장식 */}
-            <div className="absolute -left-2 top-1/2 w-3 h-3 bg-black rounded-full transform -translate-y-1/2" />
-            <div className="absolute -right-2 top-1/2 w-3 h-3 bg-black rounded-full transform -translate-y-1/2" />
+      {/* 예약 생성 테스트용 입력 폼 */}
+      <Card className="border-0 shadow-none px-6">
+        <CardHeader className="p-4 pb-2">
+          <CardTitle className="text-lg font-medium">예약 생성 테스트</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 space-y-4">
+          <div className="space-y-2">
+            <label className="block text-sm text-gray-600">
+              예약 번호
+              <input
+                type="text"
+                name="reservation_id"
+                value={reservationPayload.reservation_id}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-gray-300 rounded-md"
+              />
+            </label>
+            <label className="block text-sm text-gray-600">
+              디자이너 ID
+              <input
+                type="text"
+                name="designer_id"
+                value={reservationPayload.designer_id}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-gray-300 rounded-md"
+              />
+            </label>
+            <label className="block text-sm text-gray-600">
+              사용자 ID
+              <input
+                type="text"
+                name="user_id"
+                value={reservationPayload.user_id}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-gray-300 rounded-md"
+              />
+            </label>
+            <label className="block text-sm text-gray-600">
+              예약 날짜 및 시간
+              <input
+                type="text"
+                name="reservation_date_time"
+                value={reservationPayload.reservation_date_time}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-gray-300 rounded-md"
+              />
+            </label>
+            <label className="block text-sm text-gray-600">
+              컨설팅 비용
+              <input
+                type="text"
+                name="consulting_fee"
+                value={reservationPayload.consulting_fee}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-gray-300 rounded-md"
+              />
+            </label>
+            <label className="block text-sm text-gray-600">
+              Google Meet 링크
+              <input
+                type="text"
+                name="google_meet_link"
+                value={reservationPayload.google_meet_link}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-gray-300 rounded-md"
+              />
+            </label>
+            <label className="block text-sm text-gray-600">
+              예약 모드
+              <input
+                type="text"
+                name="mode"
+                value={reservationPayload.mode}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-gray-300 rounded-md"
+              />
+            </label>
+            <label className="block text-sm text-gray-600">
+              예약 상태
+              <input
+                type="text"
+                name="status"
+                value={reservationPayload.status}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-gray-300 rounded-md"
+              />
+            </label>
           </div>
-        </div>
-      </div>
+          <Button
+            className="mt-4 bg-black hover:bg-gray-800 text-white w-full h-12"
+            onClick={handleCreateReservation}
+          >
+            예약 생성
+          </Button>
+        </CardContent>
+      </Card>
 
-      {/* 하단 버튼 - fixed 제거하고 margin으로 간격 조정 */}
+      <Separator className="my-4" />
+
+      {/* 하단 버튼 */}
       <div className="min-w-[375px] max-w-[430px] m-auto p-4 bg-white border-t mt-8">
         <div className="flex gap-3 px-2">
           <Button
