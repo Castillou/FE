@@ -24,7 +24,7 @@ const LoginPage = () => {
 
   return (
     <>
-      <div className="min-h-dvh pt-36 pb-20 px-12 flex flex-col justify-between">
+      <div className="min-h-dvh px-12 flex flex-col justify-center gap-20">
         <LogoSection />
         <ButtonSection />
       </div>

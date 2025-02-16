@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Reservation } from "@/types/apiTypes";
 import { formatReservationDate } from "@/utils/dayFormat";
 import { useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 
 interface ReservationItemProps {
@@ -47,6 +48,9 @@ const DesignerItem = ({ reservation }: ReservationItemProps) => {
     );
   }
 
+  // 예약 시간이 지났는지 확인
+  const isPastReservation = dayjs(reservation.reservation_date_time).isBefore(dayjs());
+
   return (
     <li onClick={handleClick} className="px-6 py-4 bg-gray-scale-100 rounded-xl">
       <article className="flex mb-1 items-center justify-between">
@@ -60,12 +64,15 @@ const DesignerItem = ({ reservation }: ReservationItemProps) => {
           <span
             className={cn(
               "bg-white px-3 py-1 rounded-full block text-body2", // 기본 스타일
-              reservation.status === "예약완료"
+              isPastReservation
+                ? "bg-green-500/20 text-body2" // 지난 예약은 초록색 배경
+                : reservation.status === "예약완료"
                 ? "bg-info-500/20 text-body2"
                 : "bg-red-500/20 text-body2"
             )}
           >
-            {reservation.status}
+            {isPastReservation ? "이용완료" : reservation.status}
+            {/* 지난 예약은 "이용완료"로 표시 */}
           </span>
         </div>
       </article>

@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from 'react-router-dom';
-import { PATH } from '@/constants/path';
+import { useNavigate } from "react-router-dom";
+import { PATH } from "@/constants/path";
 
 const PaymentBankTransferPage = () => {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ const PaymentBankTransferPage = () => {
   return (
     <div className="min-h-dvh bg-gray-50">
       <h1 className="text-xl font-medium p-4 text-center border-b">계좌이체 안내</h1>
-      
+
       <div className="px-6">
         {/* 예약 완료 메시지 */}
         <div className="py-8 text-center">
@@ -35,8 +35,8 @@ const PaymentBankTransferPage = () => {
                 <span className="font-medium">할마리</span>
               </div>
               <div className="mt-4 p-3 bg-white rounded text-sm text-gray-600">
-                ※ 예약자 성함과 동일한 이름으로 입금해 주세요.<br />
-                ※ 24시간 이내 미입금 시 예약이 자동 취소됩니다.
+                ※ 예약자 성함과 동일한 이름으로 입금해 주세요.
+                <br />※ 24시간 이내 미입금 시 예약이 자동 취소됩니다.
               </div>
             </div>
           </CardContent>
@@ -46,16 +46,16 @@ const PaymentBankTransferPage = () => {
       {/* 하단 버튼 */}
       <div className="min-w-[375px] max-w-[430px] m-auto p-4 px-6 bg-white border-t mt-8">
         <div className="flex gap-3">
-          <Button 
+          <Button
             variant="outline"
             className="w-1/2 h-12"
             onClick={() => navigate(PATH.reservationList)}
           >
             예약확인
           </Button>
-          <Button 
+          <Button
             className="w-1/2 h-12 bg-black hover:bg-gray-800"
-            onClick={() => navigate('/')}
+            onClick={() => navigate(PATH.designerList)}
           >
             홈으로
           </Button>
@@ -65,4 +65,4 @@ const PaymentBankTransferPage = () => {
   );
 };
 
-export default PaymentBankTransferPage; 
+export default PaymentBankTransferPage;

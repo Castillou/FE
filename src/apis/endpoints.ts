@@ -9,6 +9,7 @@ interface ReservationEndpoint {
   get_list: (user_Id: string) => string;
   get_detail: (reservation_Id: string) => string;
   cancel: (reservation_Id: string) => string;
+  generateGoogleMeet: (reservation_Id: string) => string;
 }
 
 interface DesignerEndpoint {
@@ -33,6 +34,8 @@ export const RESERVATION_ENDPOINT: ReservationEndpoint = Object.freeze({
   get_detail: (reservation_Id: string) =>
     `/reservation/get_detail?reservation_id=${reservation_Id}`, // 예약 상세 정보 조회
   cancel: (reservation_Id: string) => `/reservation/cancel?reservation_id=${reservation_Id}`, // 예약 취소
+  generateGoogleMeet: (reservation_Id: string) =>
+    `/reservation/generate_google_meet_link?reservation_id=${reservation_Id}`, // 구글밋 생성
 });
 
 /**

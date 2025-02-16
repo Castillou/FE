@@ -53,8 +53,8 @@ const ReservationDetailPage = () => {
   });
 
   return (
-    <div className="pb-24">
-      <h2 className="pt-4 px-5 text-xl font-bold mb-4">예약 상세정보</h2>
+    <div className="pt-8 px-8 pb-5">
+      <h2 className="text-xl font-bold mb-4">예약 상세정보</h2>
       <ReservationDetailContent data={data} isPending={isPending} isError={isError} />
     </div>
   );

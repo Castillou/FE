@@ -1,6 +1,6 @@
 const ImageSection = () => {
   return (
-    <section className="px-4">
+    <section>
       <div className="mb-4 w-full aspect-ratio rounded-xl overflow-hidden">
         <img
           src="https://placehold.co/300x300?text=haertz"

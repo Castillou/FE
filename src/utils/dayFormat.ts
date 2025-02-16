@@ -20,3 +20,14 @@ export const formatDate = (date: string) => {
 
   return formattedData;
 };
+
+export const isWithin30Minutes = (reservationDateTime: string): boolean => {
+  const now = dayjs(); // 현재 시간
+  const reservationTime = dayjs(reservationDateTime); // 예약 시간
+
+  // 예약 시간과 현재 시간의 차이를 분 단위로 계산
+  const diffInMinutes = reservationTime.diff(now, "minute");
+
+  // 차이가 0 이상이고 30분 이하인지 확인
+  return diffInMinutes >= 0 && diffInMinutes <= 30;
+};

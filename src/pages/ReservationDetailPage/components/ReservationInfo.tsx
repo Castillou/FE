@@ -1,16 +1,35 @@
 import { getDesignerDetail } from "@/apis/designerDetail";
-import { Button } from "@/components/ui/button";
+import { reservationCancel } from "@/apis/reservationCancel";
+import { getGoogleMeetLink } from "@/apis/generateGoogleMeet";
+import { PATH } from "@/constants/path";
 import QUERY_KEY from "@/constants/queryKey";
 import { cn } from "@/lib/utils";
 import { Reservation } from "@/types/apiTypes";
-import { formatReservationDate } from "@/utils/dayFormat";
+import { formatReservationDate, isWithin30Minutes } from "@/utils/dayFormat";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import devApi from "@/config/axiosDevConfig";
 
 interface ReservationInfoProps {
   reservation: Reservation;
 }
 
 const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
+  const navigate = useNavigate();
+  const [googleMeetLink, setGoogleMeetLink] = useState<string | null>(null);
+
   // 디자이너 정보를 useQuery로 불러오기
   const {
     data: designer,
@@ -24,6 +43,24 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
     gcTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,
   });
+
+  // 예약 시간이 30분 이내인지 확인하고 구글 미트 링크를 가져오는 로직
+  useEffect(() => {
+    const fetchGoogleMeetLink = async () => {
+      if (isWithin30Minutes(reservation.reservation_date_time)) {
+        const link = await getGoogleMeetLink(reservation.id);
+        setGoogleMeetLink(link);
+      }
+    };
+
+    fetchGoogleMeetLink();
+  }, [reservation.reservation_date_time, reservation.id]);
+
+  // 예약 시간이 지났는지 확인
+  const isPastReservation = dayjs(reservation.reservation_date_time).isBefore(dayjs());
+
+  // "재예약" 상태인지 확인 (예약 취소 또는 이용 완료)
+  const isReReservation = reservation.status === "예약취소" || isPastReservation;
 
   // 로딩 상태 표시
   if (isLoading) {
@@ -39,8 +76,41 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
     );
   }
 
+  // 예약 취소 처리
+  const handleCancelReservation = async () => {
+    const response = await reservationCancel(reservation.id);
+    if (response.status === 200) {
+      alert("예약취소 되었습니다.");
+      navigate(PATH.reservationList);
+    }
+  };
+
+  // 재예약 처리
+  const handleReReservation = async () => {
+    try {
+      const response = await devApi.post("/reservation/create", {
+        reservation_id: reservation.id,
+        designer_id: reservation.designer_id,
+        user_id: reservation.user_id,
+        reservation_date_time: reservation.reservation_date_time,
+        consulting_fee: reservation.consulting_fee,
+        google_meet_link: reservation.google_meet_link,
+        mode: reservation.mode,
+        status: "예약완료", // 재예약 시 상태를 "예약완료"로 설정
+      });
+
+      if (response.status === 200) {
+        alert("재예약이 완료되었습니다.");
+        navigate(PATH.reservationList);
+      }
+    } catch (error) {
+      console.error("재예약 실패:", error);
+      alert("재예약에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
+
   return (
-    <section className="px-4 flex flex-col justify-between">
+    <section className="flex flex-col justify-between">
       <article className="flex mb-4 items-center justify-between">
         <h3 className="text-xl font-bold">이초 디자이너</h3>
         <span className="text-body2 font-light text-gray-scale-300">
@@ -55,12 +125,14 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
           <span
             className={cn(
               "bg-white px-3 py-1 rounded-full block text-body2", // 기본 스타일
-              reservation.status === "예약완료"
+              isPastReservation
+                ? "bg-green-500/20 text-body2" // 지난 예약은 초록색 배경
+                : reservation.status === "예약완료"
                 ? "bg-info-500/20 text-body2"
                 : "bg-red-500/20 text-body2"
             )}
           >
-            {reservation.status}
+            {isPastReservation ? "이용 완료" : reservation.status}
           </span>
         </div>
 
@@ -68,12 +140,56 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
           {Intl.NumberFormat("ko-KR").format(reservation.consulting_fee)}원
         </span>
       </article>
-      <div className="border border-gray-scale-200 rounded text-sm text-gray-scale-400 p-2 mb-2 text-center">
+      <div className="border border-gray-scale-200 rounded text-sm text-gray-scale-400 p-2 mb-3 text-center">
         {reservation.mode === "대면" && designer.shop_address}
         {reservation.mode === "비대면" &&
-          (reservation.google_meet_link || "생성된 구글 미트 링크가 없습니다.")}
+          (isWithin30Minutes(reservation.reservation_date_time)
+            ? googleMeetLink || "구글 미트 링크를 생성 중입니다..."
+            : "구글 미트 링크는 30분 전에 생성됩니다.")}
       </div>
-      <Button onClick={() => alert("예약이 취소되었습니다.")}>예약 취소</Button>
+
+      {/* 재예약 상태인 경우 재예약 버튼 표시, 그렇지 않으면 예약 취소 버튼 표시 */}
+      {isReReservation ? (
+        <button
+          onClick={handleReReservation}
+          className="w-full bg-purple-500 py-3 text-body1 text-white rounded-lg"
+        >
+          재예약
+        </button>
+      ) : (
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="w-full bg-gray-scale-200 py-3 text-body1 text-gray-scale-100 rounded-lg">
+              예약 취소
+            </button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>
+                <div className="w-full flex justify-center pt-6 mb-4">
+                  <div className="w-28 h-28 text-title text-purple-500 bg-purple-100 rounded-full flex items-center justify-center">
+                    !
+                  </div>
+                </div>
+              </DialogTitle>
+              <DialogDescription>
+                <div className="text-center text-body1 mb-3">정말로 예약을 취소하시겠습니까?</div>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <button
+                onClick={handleCancelReservation}
+                className="w-24 bg-gray-scale-100 py-2 text-sub-body1 text-gray-scale-400 rounded-lg"
+              >
+                취소
+              </button>
+              <DialogClose className="w-24  py-2 text-sub-body1 bg-purple-500 text-purple-100 rounded-lg">
+                아니오
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </section>
   );
 };

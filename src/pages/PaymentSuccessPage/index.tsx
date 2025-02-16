@@ -1,8 +1,8 @@
-import { useEffect, useState, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { paymentApi } from '../../services/paymentApi';
-import { PATH } from '@/constants/path';
-import { AxiosError } from 'axios';
+import { useEffect, useState, useRef } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { paymentApi } from "../../services/paymentApi";
+import { PATH } from "@/constants/path";
+import { AxiosError } from "axios";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -40,36 +40,35 @@ const PaymentSuccessPage = () => {
       isProcessingRef.current = true;
 
       try {
-        const pg_token = searchParams.get('pg_token');
-        const tid = localStorage.getItem('tid');
-        const order_id = localStorage.getItem('order_id');
+        const pg_token = searchParams.get("pg_token");
+        const tid = localStorage.getItem("tid");
+        const order_id = localStorage.getItem("order_id");
 
         if (!pg_token || !tid || !order_id) {
-          throw new Error('결제 정보가 없습니다.');
+          throw new Error("결제 정보가 없습니다.");
         }
 
         try {
           const response = await paymentApi.approve({
             tid,
             pg_token,
-            order_id
+            order_id,
           });
-          
-          localStorage.removeItem('tid');
-          localStorage.removeItem('order_id');
+
+          localStorage.removeItem("tid");
+          localStorage.removeItem("order_id");
           setLoading(false);
           setPaymentInfo(response);
-
         } catch (err: unknown) {
           if (err instanceof AxiosError) {
-            setError(err.response?.data?.detail || '결제 승인 중 오류가 발생했습니다.');
+            setError(err.response?.data?.detail || "결제 승인 중 오류가 발생했습니다.");
           } else {
-            setError('결제 승인 중 오류가 발생했습니다.');
+            setError("결제 승인 중 오류가 발생했습니다.");
           }
           setLoading(false);
         }
       } catch {
-        setError('결제 정보가 올바르지 않습니다.');
+        setError("결제 정보가 올바르지 않습니다.");
         setLoading(false);
       }
     };
@@ -110,20 +109,20 @@ const PaymentSuccessPage = () => {
               <span className="text-[14px] text-gray-400 w-24">날짜/시간</span>
               <span className="text-gray-700">2025년 2월 21일 오전 11:30</span>
             </div>
-            
+
             <div className="flex">
               <span className="text-[14px] text-gray-400 w-24">매장/담당</span>
               <span className="text-gray-700">헤어디너 컨설스토리점</span>
             </div>
-            
+
             <div className="flex">
               <span className="text-[14px] text-gray-400 w-24">컨설팅 방식</span>
               <span className="text-gray-700">대면</span>
             </div>
-            
+
             <div className="flex">
               <span className="text-[14px] text-gray-400 w-24">예약자</span>
-              <span className="text-gray-700">{paymentInfo?.user_id || '사용자'}</span>
+              <span className="text-gray-700">{paymentInfo?.user_id || "사용자"}</span>
             </div>
           </div>
         </CardContent>
@@ -143,7 +142,9 @@ const PaymentSuccessPage = () => {
           </div>
           <div className="flex">
             <span className="text-[14px] text-gray-400 w-24">결제 시간</span>
-            <span className="text-gray-700">{paymentInfo && new Date(paymentInfo.approved_at).toLocaleString()}</span>
+            <span className="text-gray-700">
+              {paymentInfo && new Date(paymentInfo.approved_at).toLocaleString()}
+            </span>
           </div>
         </CardContent>
       </Card>
@@ -154,7 +155,7 @@ const PaymentSuccessPage = () => {
           <div className="text-white text-sm mb-3 text-center">
             쿠폰받고 헤르츠 특별 컨설팅도 이용해보세요!
           </div>
-          
+
           <div className="bg-[#FFD700] p-3 rounded-lg relative overflow-hidden w-[85%] mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
@@ -166,17 +167,17 @@ const PaymentSuccessPage = () => {
                 </div>
               </div>
               {/* 다운로드 아이콘 */}
-              <svg 
-                className="w-5 h-5 text-black" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-5 h-5 text-black"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M19 14l-7 7m0 0l-7-7m7 7V3" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
                 />
               </svg>
             </div>
@@ -190,16 +191,20 @@ const PaymentSuccessPage = () => {
       {/* 하단 버튼 - fixed 제거하고 margin으로 간격 조정 */}
       <div className="min-w-[375px] max-w-[430px] m-auto p-4 bg-white border-t mt-8">
         <div className="flex gap-3 px-2">
-          <Button 
-            variant="outline" 
-            className="w-1/2 h-12" 
-            onClick={() => navigate(PATH.reservationList)}
+          <Button
+            variant="outline"
+            className="w-1/2 h-12"
+            onClick={() =>
+              paymentInfo?.reservation_id
+                ? navigate(PATH.reservationDetail(paymentInfo?.reservation_id))
+                : navigate(PATH.reservationList)
+            }
           >
             예약확인
           </Button>
-          <Button 
-            className="w-1/2 h-12 bg-black hover:bg-gray-800" 
-            onClick={() => navigate('/')}
+          <Button
+            className="w-1/2 h-12 bg-black hover:bg-gray-800"
+            onClick={() => navigate(PATH.designerList)}
           >
             홈으로
           </Button>
@@ -209,4 +214,4 @@ const PaymentSuccessPage = () => {
   );
 };
 
-export default PaymentSuccessPage; 
+export default PaymentSuccessPage;

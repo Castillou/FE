@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
 import devApi from "@/config/axiosDevConfig";
-import { Button } from "@/components/ui/button";
 
 interface GoogleLoginResponse {
   auth_url: string;
@@ -35,13 +34,13 @@ const ButtonSection = () => {
 
   return (
     <section>
-      <Button
+      <button
         onClick={handleOAuth}
-        className="w-full rounded-full py-6 my-6 text-lg text-white"
+        className="w-full rounded-lg py-3 my-5 text-sub-title bg-[#B434FF] text-white"
         disabled={isSubmitting}
       >
         {isSubmitting ? "요청중..." : "구글 로그인"}
-      </Button>
+      </button>
       {submitError && <p className="mt-1 text-sm text-center text-red-500">{submitError}</p>}
       <span className="block text-body2 text-gray-scale-200 text-center">
         haertz는 구글 계정으로 로그인 가능합니다.
