@@ -12,7 +12,7 @@ const DesignerItem = ({ designer }: DesignerItemProps) => {
       <article className="w-full border-b  mt-4 border-gray-200 py-[22px] flex justify-between">
         <div className="flex flex-col justify-between">
           <div>
-            <p className="text-[11px] mb-2 text-[#737373]">{designer.shop_address}</p>
+            <p className="text-[11px] mb-2 text-[#737373]">{designer.region}</p>
             <p className="text-[18px] font-bold mb-2">{designer.name}</p>
             <p className="w-48 whitespace-nowrap overflow-hidden text-ellipsis text-body2 text-[#676767]">
               {designer.introduction}
@@ -32,12 +32,13 @@ const DesignerItem = ({ designer }: DesignerItemProps) => {
           </div>
         </div>
 
-        <div>
+        <div className="flex flex-col items-center justify-between gap-7">
           <img
-            src="https://placehold.co/118x118?text=haertz"
+            src="https://placehold.co/68x68?text=haertz"
             alt="designer image"
             className="object-cover rounded-md"
           />
+          <span className="text-[18px]">{designer.face_consulting_fee.toLocaleString()}원~</span>
         </div>
       </article>
     </section>

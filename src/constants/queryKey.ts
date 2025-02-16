@@ -1,5 +1,7 @@
+import { FilterOptions } from "@/types/types";
+
 const DESIGNER = {
-  list: ["designerList"],
+  list: (filterOptions: FilterOptions) => ["designerList", { filterOptions }],
   detail: (designer_id: string) => ["designerDetail", designer_id],
 };
 

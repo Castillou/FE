@@ -1,115 +1,97 @@
 import { getDesignerList } from "@/apis/designerList";
 import QUERY_KEY from "@/constants/queryKey";
 import { useQuery } from "@tanstack/react-query";
-import DesignerList from "./components/DesignerList";
-import { getReservationList } from "@/apis/reservation";
-import { useMemo, useState } from "react";
-import { Reservation } from "@/types/apiTypes";
-import dayjs from "dayjs";
-import ReservationItem from "./components/ReservationItem";
-import { formatDate } from "@/utils/dayFormat";
-import { Button } from "@/components/ui/button";
+import DesignerList from "./components/DesignerList/DesignerList";
+import { useState } from "react";
 
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import DesignerFilterDrawer from "./components/DesignerFilterDrawer";
-import { FilterOptions } from "@/types/types";
-import FilteredOptionBox from "./components/filteredOptionbox";
+import { DesignerFilterMode, DesignerLocation, FilterOptions } from "@/types/types";
+import FilteredOptionBox from "./components/DesignerFilter/FilteredOptionBox";
+import FilterDrawer from "./components/DesignerFilter/FilterDrawer";
+import { handleLocation, handleMode } from "@/utils/filterOption";
 
 const DesignerListPage = () => {
-  // setFilterOptions 배포 확인 위해 제거
-  const [filterOptions] = useState<FilterOptions>({
-    designer_mode: ["대면", "비대면"],
-    designer_location: ["홍대/연남/합정"],
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    designer_mode: undefined,
+    designer_location: ["서울 전체"],
   });
 
+  // 모드 필터링 체크 함수
+  const handleModeChange = (mode: DesignerFilterMode) => {
+    handleMode(mode, filterOptions, setFilterOptions);
+  };
+
+  // 지역 필터링 체크 함수
+  const handleLocationChange = (location: DesignerLocation) => {
+    handleLocation(location, filterOptions, setFilterOptions);
+  };
+
+  // 디자이너 리스트 조회
   const { data: designerData, isPending: designerPending } = useQuery({
-    queryKey: QUERY_KEY.designer.list,
-    queryFn: getDesignerList,
+    queryKey: QUERY_KEY.designer.list({ ...filterOptions }),
+    queryFn: () => getDesignerList(filterOptions),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
-
-  // console.log(designerData);
-
-  const user_id = "67ab499ba706f516fb348ddd";
-
-  const { data: reservationsData, isPending: reservationPending } = useQuery({
-    queryKey: QUERY_KEY.reservationList.list(user_id),
-    queryFn: () => getReservationList(user_id),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 60,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-  });
-
-  const upcomingReservations = useMemo(() => {
-    if (!reservationsData) return [];
-
-    const now = dayjs("2025-04-20 12:01");
-
-    const thirtyMinutesLater = now.add(30, "minute");
-
-    return reservationsData.filter((reservation: Reservation) => {
-      const reservationTime = formatDate(reservation.reservation_date_time);
-
-      return (
-        reservation.status !== "예약취소" && // 취소된 예약 제외
-        reservationTime.isAfter(now) && // 현재 시간 이후
-        reservationTime.isBefore(thirtyMinutesLater) // 30분 이내
-      );
-    });
-  }, [reservationsData]);
 
   return (
     <>
-      {reservationPending && <div>Loading...</div>}
-      {upcomingReservations.length === 0 && <div>30분 이내 예약 없음</div>}
-      {upcomingReservations.length > 0 && (
-        <ReservationItem reservationData={upcomingReservations[0]}></ReservationItem>
-      )}
-
       <div>
         {designerPending ? (
           <div>Loading...</div>
         ) : (
-          <div className="w-full">
-            <Drawer>
-              <div className="w-full flex justify-between px-8 py-4 border-b border-gray-200">
-                <div className="flex gap-2">
-                  {filterOptions.designer_mode?.map((option) => (
-                    <FilteredOptionBox key={option} option={option}></FilteredOptionBox>
-                  ))}
-                  {filterOptions.designer_location?.map((option) => (
-                    <FilteredOptionBox key={option} option={option}></FilteredOptionBox>
-                  ))}
-                </div>
+          <div className="w-full pt-[50px]">
+            <div className="flex justify-between items-end pb-[18px] px-6">
+              <p className="text-[40px] leading-[44px] text-[#D896FF]">
+                <strong className="text-[#D896FF]">땅콩형 얼굴</strong>이 <br />
+                고민이에요
+              </p>
 
-                <DrawerTrigger>
-                  <div>
-                    <img src="images/mage_filter.svg" alt="필터" />
-                  </div>
-                </DrawerTrigger>
+              <div className="cursor-pointer">
+                <p className="text-[#D896FF] border-b border-[#D896FF]">변경</p>
+              </div>
+            </div>
+
+            <div className="w-full flex justify-between px-6 py-4 border-b border-t border-gray-200">
+              <div className="flex flex-wrap gap-2 w-[80%]">
+                {/* 지역 필터링 */}
+                {filterOptions.designer_location?.map((option) => (
+                  <FilteredOptionBox
+                    key={option}
+                    option={option}
+                    type={"location"}
+                    handleLocationChange={handleLocationChange}
+                    handleModeChange={handleModeChange}
+                  ></FilteredOptionBox>
+                ))}
+                {/* 모드 필터링 */}
+                {filterOptions.designer_mode && (
+                  <FilteredOptionBox
+                    option={filterOptions.designer_mode}
+                    type={"mode"}
+                    handleModeChange={handleModeChange}
+                    handleLocationChange={handleLocationChange}
+                  ></FilteredOptionBox>
+                )}
               </div>
 
-              <DesignerList designers={designerData.designer_list} />
+              <div onClick={() => setIsDrawerOpen(true)} className="cursor-pointer">
+                <img src="/images/mage_filter.svg" alt="필터" />
+              </div>
+            </div>
 
-              <DrawerContent className="max-w-[375px] m-auto px-[18px] pb-[18px]">
-                <DesignerFilterDrawer />
-                <DrawerFooter>
-                  <DrawerClose>
-                    <Button variant="outline">Cancel</Button>
-                  </DrawerClose>
-                </DrawerFooter>
-              </DrawerContent>
-            </Drawer>
+            {/* 디자이너 리스트 */}
+            <DesignerList designers={designerData} />
+
+            <FilterDrawer
+              isDrawerOpen={isDrawerOpen}
+              setIsDrawerOpen={setIsDrawerOpen}
+              setFilterOptions={setFilterOptions}
+              filterOptions={filterOptions}
+            ></FilterDrawer>
           </div>
         )}
       </div>
