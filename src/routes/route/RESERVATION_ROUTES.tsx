@@ -1,5 +1,5 @@
 import { PATH } from "@/constants/path";
-import { ReservationListPage, ReservationDetailPage } from "@/pages";
+import { ReservationListPage, ReservationDetailPage, ReservationPrepare } from "@/pages";
 
 const RESERVATION_ROUTES = [
   {
@@ -9,6 +9,10 @@ const RESERVATION_ROUTES = [
   {
     path: PATH.reservationDetailPath,
     element: <ReservationDetailPage />,
+  },
+  {
+    path: PATH.reservationPreparePath,
+    element: <ReservationPrepare />,
   },
 ];
 
