@@ -36,3 +36,10 @@ export interface User {
   updated_at: string;
   id: string;
 }
+
+export interface DesignerReservationList {
+  reservation_date_time: string;
+  consulting_fee: number;
+  mode: string;
+  status: string;
+}

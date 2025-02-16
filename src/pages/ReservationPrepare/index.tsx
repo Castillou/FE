@@ -2,6 +2,9 @@ import * as React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import ReservationPrepareHeader from "./components/ReservationPrepareHeader";
+import { ReservationList } from "@/apis/reservation";
+import dayjs from "dayjs";
+import { DesignerReservationList } from "@/types/apiTypes";
 
 const timeSlots = [
   { label: "오전", slots: ["10:00", "10:30", "11:00", "11:30"] },
@@ -30,6 +33,33 @@ const timeSlots = [
 const ReservationPrepare = () => {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = React.useState<string>();
+  const [reservationList, setReservationList] = React.useState<DesignerReservationList[]>([]);
+
+  const designer_id = "67ab727934cd2146254af06a";
+
+  React.useEffect(() => {
+    const fetchReservationList = async () => {
+      const response = await ReservationList(designer_id);
+      setReservationList(response.reservation_list);
+    };
+
+    fetchReservationList();
+  }, [designer_id]);
+
+  const getDisabledTimes = () => {
+    if (!date) return [];
+
+    return reservationList
+      .filter(
+        (reservation) =>
+          reservation.status === "예약완료" &&
+          dayjs(reservation.reservation_date_time).format("YYYY-MM-DD") ===
+            dayjs(date).format("YYYY-MM-DD")
+      )
+      .map((reservation) => dayjs(reservation.reservation_date_time).format("HH:mm"));
+  };
+
+  const disabledTimes = getDisabledTimes();
 
   return (
     <div className="pt-8 px-8 pb-28">
@@ -44,7 +74,7 @@ const ReservationPrepare = () => {
           mode="single"
           selected={date}
           onSelect={setDate}
-          disabled={(date) => date < new Date()}
+          disabled={(date) => date < dayjs().startOf("day").toDate()}
           className="w-full rounded-md border"
         />
 
@@ -59,9 +89,12 @@ const ReservationPrepare = () => {
                       key={time}
                       className={cn(
                         "h-10 border rounded-md text-gray-scale-400",
-                        selectedTime === time && "bg-purple-400 text-purple-50"
+                        selectedTime === time && "bg-purple-400 text-purple-50",
+                        disabledTimes.includes(time) &&
+                          "bg-gray-300 text-gray-500 cursor-not-allowed"
                       )}
-                      onClick={() => setSelectedTime(time)}
+                      onClick={() => !disabledTimes.includes(time) && setSelectedTime(time)}
+                      disabled={disabledTimes.includes(time)}
                     >
                       {time}
                     </button>
@@ -73,7 +106,20 @@ const ReservationPrepare = () => {
         </div>
       </div>
 
-      <button className="w-full py-2 bg-purple-500 text-purple-50 rounded-lg">예약하기</button>
+      {selectedTime ? (
+        <button
+          className="w-full py-2 bg-purple-500 text-purple-50 rounded-lg"
+          onClick={() =>
+            alert(`${dayjs(date).format("MM월 DD일")}에 ${selectedTime}에 예약했습니다.`)
+          }
+        >
+          예약하기
+        </button>
+      ) : (
+        <button className="w-full py-2 bg-gray-300 text-gray-500 rounded-lg" disabled>
+          예약하기
+        </button>
+      )}
     </div>
   );
 };

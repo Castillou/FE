@@ -1,6 +1,6 @@
 import { PATH } from "@/constants/path";
-import { 
-  PaymentPage, 
+import {
+  PaymentPage,
   PaymentSuccessPage,
   PaymentPreparePage,
   PaymentBankTransferPage,

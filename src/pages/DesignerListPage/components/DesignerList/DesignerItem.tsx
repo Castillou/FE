@@ -1,14 +1,20 @@
+import { PATH } from "@/constants/path";
 import { Designer } from "@/types/apiTypes";
 import { DesignerMode } from "@/types/types";
 import designerModeFormat from "@/utils/designerModeFormat";
-
+import { useNavigate } from "react-router-dom";
 interface DesignerItemProps {
   designer: Designer;
 }
 
 const DesignerItem = ({ designer }: DesignerItemProps) => {
+  const navigate = useNavigate();
+
   return (
-    <section className="bg-white px-7">
+    <li
+      className="bg-white px-7 cursor-pointer"
+      onClick={() => navigate(PATH.designerDetail(designer.id))}
+    >
       <article className="w-full border-b  mt-4 border-gray-200 py-[22px] flex justify-between">
         <div className="flex flex-col justify-between">
           <div>
@@ -41,7 +47,7 @@ const DesignerItem = ({ designer }: DesignerItemProps) => {
           <span className="text-[18px]">{designer.face_consulting_fee.toLocaleString()}원~</span>
         </div>
       </article>
-    </section>
+    </li>
   );
 };
 

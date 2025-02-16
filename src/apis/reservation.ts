@@ -9,3 +9,14 @@ export const getReservationList = async (user_id: string) => {
     console.error(error);
   }
 };
+
+export const ReservationList = async (designer_id: string) => {
+  try {
+    const response = await devApi.post(RESERVATION_ENDPOINT.list, {
+      designer_id: designer_id,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
