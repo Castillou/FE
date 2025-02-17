@@ -1,7 +1,7 @@
-import { User } from "@/types/apiTypes";
+import { UserMeResponse } from "@/types/user";
 
 interface ProfileInfoProps {
-  user: User;
+  user: UserMeResponse;
 }
 
 const ProfileInfo = ({ user }: ProfileInfoProps) => {

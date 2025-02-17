@@ -1,4 +1,5 @@
 import { userLogout } from "@/apis/userLogout";
+import { PATH } from "@/constants/path";
 import { useNavigate } from "react-router-dom";
 
 const MyPageHeader = () => {
@@ -6,10 +7,11 @@ const MyPageHeader = () => {
 
   const handleLogout = async () => {
     const response = await userLogout();
-    if (response.status === 200) {
+    console.log(response);
+    if (response.message) {
       alert("로그아웃 되었습니다.");
-      navigate("/");
     }
+    navigate(PATH.login);
   };
   return (
     <header className="flex items-center justify-between mb-5">

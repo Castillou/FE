@@ -34,7 +34,7 @@ export interface User {
   refresh_token: string;
   created_at: string;
   updated_at: string;
-  id: string;
+  user_id: string;
 }
 
 export interface DesignerReservationList {

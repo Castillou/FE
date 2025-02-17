@@ -11,6 +11,7 @@ const RESERVATION = {
 };
 
 const USER = {
+  me: ["user"],
   email: (email: string) => ["user", { email }],
 };
 

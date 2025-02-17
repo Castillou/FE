@@ -15,7 +15,7 @@ const LoginPage = () => {
     if (error) {
       toast({
         variant: "destructive",
-        title: "로그인에 실패하였습니다.",
+        title: "로그인 실패",
         description: decodeURIComponent(error),
         duration: 3000,
       });

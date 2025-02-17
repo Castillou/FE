@@ -45,8 +45,6 @@ const ReservationPrepare = () => {
       ? reservationData?.face_consulting_fee
       : reservationData?.non_face_consulting_fee;
 
-  const designer_id = "67ab727934cd2146254af06a";
-
   const getDisabledTimes = () => {
     if (!date) return [];
 
@@ -76,24 +74,47 @@ const ReservationPrepare = () => {
   const disabledTimes = getDisabledTimes();
 
   const navigatePaymentPage = () => {
+    if (!date || !selectedTime) return;
+
+    // 시간 형식 변환 - 예: "1:00" -> "13:00" 등과 같이 12시간제를 24시간제로 변환
+    let formattedTime = selectedTime;
+    if (
+      selectedTime.includes(":") &&
+      !selectedTime.startsWith("10") &&
+      !selectedTime.startsWith("11") &&
+      !selectedTime.startsWith("12")
+    ) {
+      const [hour, minute] = selectedTime.split(":");
+      const hourNum = parseInt(hour);
+      if (hourNum < 10) {
+        // 오후 시간대 (1시~9시)는 12를 더해 24시간제로 변환
+        formattedTime = `${hourNum + 12}:${minute}`;
+      }
+    }
+
+    // 날짜와 시간 합치기
+    const selectedDateTime = dayjs(date)
+      .set("hour", parseInt(formattedTime.split(":")[0]))
+      .set("minute", parseInt(formattedTime.split(":")[1]))
+      .toDate();
+
     navigate(PATH.payments, {
       state: {
         reservationData: reservationData,
         servicePrice: servicePrice,
-        selectedDate: date,
-        selectedTime: selectedTime,
+        selectedDateTime: selectedDateTime, // 날짜와 시간이 결합된 Date 객체
       },
     });
   };
 
   useEffect(() => {
     const fetchReservationList = async () => {
-      const response = await ReservationList(designer_id);
+      const response = await ReservationList(reservationData.id);
       setReservationList(response.reservation_list);
     };
 
     fetchReservationList();
-  }, [designer_id]);
+  }, [reservationData]);
 
   return (
     <div className="pt-8 px-8">

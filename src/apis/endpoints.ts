@@ -59,6 +59,6 @@ export const DESIGNER_ENDPOINT: DesignerEndpoint = Object.freeze({
 
 export const MYPAGE_ENDPOINT: MypageEndpoint = Object.freeze({
   me: "/user/me",
-  email: (email: string) => `/user/${email}`, // 디자이너 상세 정보
+  email: (email: string) => `/user/${email}`,
   delete: "/user/delete",
 });

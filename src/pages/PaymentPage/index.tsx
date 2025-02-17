@@ -39,16 +39,14 @@ const PaymentPage = () => {
         status: "pending",
       });
 
-
       localStorage.setItem("tid", readyResponse.tid);
       localStorage.setItem("order_id", readyResponse.payment_id);
-
 
       await ReservationCreate({
         reservation_id: reservationData.reservationId,
         designer_id: "",
         user_id: userInfo.user_id,
-        reservation_date_time: state.selectedDate,
+        reservation_date_time: state.selectedDateTime,
         consulting_fee: state.servicePrice,
         google_meet_link: "",
         mode: reservationData.selectedMode,
@@ -59,7 +57,7 @@ const PaymentPage = () => {
       navigate(PATH.payments, { state: { reservationId: reservationData.reservationId } });
     } catch (error) {
       console.error("예약 실패:", error);
-      alert("예약에 실패했습니다. 다시 시도해주세요.");
+      setError("예약에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -110,7 +108,7 @@ const PaymentPage = () => {
             <div className="space-y-2 text-sm text-gray-600">
               <div>{reservationData.selectedMode}</div>
               <div>디자이너 이름 : {reservationData.name}</div>
-              <div>일정: {formatReservationDate(state.selectedDate)}</div>
+              <div>일정: {formatReservationDate(state.selectedDateTime)}</div>
               <div>가격: {Intl.NumberFormat("ko-KR").format(Number(state.servicePrice))}원</div>
             </div>
           </CardContent>
