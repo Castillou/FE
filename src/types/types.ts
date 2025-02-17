@@ -16,7 +16,7 @@ export type FilterOptions = {
 };
 
 export interface ReservationData extends DesignerDetailResponse {
-  selectedMode: DesignerMode;
+  selectedMode: DesignerMode | null;
 }
 
 export interface PaymentsData extends DesignerDetailResponse {
