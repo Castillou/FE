@@ -1,10 +1,12 @@
-import * as React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import ReservationPrepareHeader from "./components/ReservationPrepareHeader";
 import { ReservationList } from "@/apis/reservation";
 import dayjs from "dayjs";
 import { DesignerReservationList } from "@/types/apiTypes";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { PATH } from "@/constants/path";
 
 const timeSlots = [
   { label: "오전", slots: ["10:00", "10:30", "11:00", "11:30"] },
@@ -31,23 +33,25 @@ const timeSlots = [
 ];
 
 const ReservationPrepare = () => {
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
-  const [selectedTime, setSelectedTime] = React.useState<string>();
-  const [reservationList, setReservationList] = React.useState<DesignerReservationList[]>([]);
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [selectedTime, setSelectedTime] = useState<string>();
+  const [reservationList, setReservationList] = useState<DesignerReservationList[]>([]);
+  const { state } = useLocation();
+  const reservationData = state.reservationData;
+  const navigate = useNavigate();
+
+  const servicePrice =
+    reservationData?.selectedMode === "대면"
+      ? reservationData?.face_consulting_fee
+      : reservationData?.non_face_consulting_fee;
 
   const designer_id = "67ab727934cd2146254af06a";
 
-  React.useEffect(() => {
-    const fetchReservationList = async () => {
-      const response = await ReservationList(designer_id);
-      setReservationList(response.reservation_list);
-    };
-
-    fetchReservationList();
-  }, [designer_id]);
-
   const getDisabledTimes = () => {
     if (!date) return [];
+
+    const now = dayjs();
+    const isToday = dayjs(date).isSame(now, "day");
 
     return reservationList
       .filter(
@@ -56,14 +60,57 @@ const ReservationPrepare = () => {
           dayjs(reservation.reservation_date_time).format("YYYY-MM-DD") ===
             dayjs(date).format("YYYY-MM-DD")
       )
-      .map((reservation) => dayjs(reservation.reservation_date_time).format("HH:mm"));
+      .map((reservation) => dayjs(reservation.reservation_date_time).format("HH:mm"))
+      .concat(
+        // 오늘 날짜인 경우에만 현재 시간 이전의 시간들을 disabled 처리
+        isToday
+          ? Array.from({ length: 48 }, (_, i) => {
+              const hour = Math.floor(i / 2);
+              const minute = i % 2 === 0 ? "00" : "30";
+              return `${String(hour).padStart(2, "0")}:${minute}`;
+            }).filter((time) => dayjs(`${dayjs(date).format("YYYY-MM-DD")} ${time}`).isBefore(now))
+          : []
+      );
   };
 
   const disabledTimes = getDisabledTimes();
 
+  const navigatePaymentPage = () => {
+    navigate(PATH.payments, {
+      state: {
+        reservationData: reservationData,
+        servicePrice: servicePrice,
+        selectedDate: date,
+        selectedTime: selectedTime,
+      },
+    });
+  };
+
+  useEffect(() => {
+    const fetchReservationList = async () => {
+      const response = await ReservationList(designer_id);
+      setReservationList(response.reservation_list);
+    };
+
+    fetchReservationList();
+  }, [designer_id]);
+
   return (
-    <div className="pt-8 px-8 pb-28">
+    <div className="pt-8 px-8">
       <ReservationPrepareHeader />
+      <section>
+        <h3 className="text-sub-title font-bold mb-3">{reservationData?.name}</h3>
+        <p className="flex">
+          <span className="w-24 text-body1 text-gray-400 mb-2">컨설팅 방식</span>
+          <span>{reservationData?.selectedMode}</span>
+        </p>
+        <p className="flex">
+          <span className="w-24 text-body1 text-gray-400">가격</span>
+          <span>{Intl.NumberFormat("ko-KR").format(Number(servicePrice))}원</span>
+        </p>
+      </section>
+
+      <hr className="my-5" />
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -75,10 +122,12 @@ const ReservationPrepare = () => {
           selected={date}
           onSelect={setDate}
           disabled={(date) => date < dayjs().startOf("day").toDate()}
-          className="w-full rounded-md border"
+          className="w-full"
         />
 
-        <div className="py-6">
+        <hr className="my-5" />
+
+        <div>
           <div className="space-y-4">
             {timeSlots.map((period) => (
               <div key={period.label} className="space-y-3">
@@ -88,10 +137,10 @@ const ReservationPrepare = () => {
                     <button
                       key={time}
                       className={cn(
-                        "h-10 border rounded-md text-gray-scale-400",
-                        selectedTime === time && "bg-purple-400 text-purple-50",
+                        "h-10 rounded-xl bg-[#F4F4F4] text-gray-scale-400",
+                        selectedTime === time && "bg-[#D896FF] text-white",
                         disabledTimes.includes(time) &&
-                          "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          "text-gray-300 line-through cursor-not-allowed"
                       )}
                       onClick={() => !disabledTimes.includes(time) && setSelectedTime(time)}
                       disabled={disabledTimes.includes(time)}
@@ -108,16 +157,14 @@ const ReservationPrepare = () => {
 
       {selectedTime ? (
         <button
-          className="w-full py-2 bg-purple-500 text-purple-50 rounded-lg"
-          onClick={() =>
-            alert(`${dayjs(date).format("MM월 DD일")}에 ${selectedTime}에 예약했습니다.`)
-          }
+          className="w-full mt-8 py-2 bg-[#D896FF] text-white rounded-lg"
+          onClick={navigatePaymentPage}
         >
-          예약하기
+          다음
         </button>
       ) : (
-        <button className="w-full py-2 bg-gray-300 text-gray-500 rounded-lg" disabled>
-          예약하기
+        <button className="w-full mt-8 py-2 bg-gray-300 text-gray-500 rounded-lg" disabled>
+          다음
         </button>
       )}
     </div>

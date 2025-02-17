@@ -44,7 +44,7 @@ const PaymentSuccessPage = () => {
     consulting_fee: "30000",
     google_meet_link: "",
     mode: "비대면",
-    status: "예약완료"
+    status: "예약완료",
   });
 
   // input change handler
@@ -60,7 +60,10 @@ const PaymentSuccessPage = () => {
   const handleCreateReservation = async () => {
     try {
       setLoading(true);
-      const reservationResponse = await axios.post("https://harmari.duckdns.org/reservation/create", reservationPayload);
+      const reservationResponse = await axios.post(
+        "https://harmari.duckdns.org/reservation/create",
+        reservationPayload
+      );
       console.log("Reservation created:", reservationResponse.data);
       // 예약 생성 후 success 페이지 처리는 이미 이 페이지 내에서 보여주고 있으므로
       // 추가로 navigate 처리할 필요가 없을 수 있습니다.
@@ -76,7 +79,7 @@ const PaymentSuccessPage = () => {
   };
 
   useEffect(() => {
-// 개발 테스트용 URL인 경우 mock 데이터 사용
+    // 개발 테스트용 URL인 경우 mock 데이터 사용
     // if (window.location.pathname === '/payment/success-test') {
     //   setPaymentInfo({
     //     amount: 40000,
@@ -145,7 +148,7 @@ const PaymentSuccessPage = () => {
   }
 
   return (
-    <div className="min-h-dvh bg-gray-50 pb-[76px]">
+    <div className="min-h-dvh">
       {/* 상단 완료 메시지 */}
       <div className="flex flex-col items-center justify-center py-8 space-y-2">
         <Check className="w-10 h-10 mb-2 text-black stroke-2" />

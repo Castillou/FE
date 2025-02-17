@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import devApi from "@/config/axiosDevConfig";
 
 interface ReservationInfoProps {
   reservation: Reservation;
@@ -87,26 +86,7 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
 
   // 재예약 처리
   const handleReReservation = async () => {
-    try {
-      const response = await devApi.post("/reservation/create", {
-        reservation_id: reservation.id,
-        designer_id: reservation.designer_id,
-        user_id: reservation.user_id,
-        reservation_date_time: reservation.reservation_date_time,
-        consulting_fee: reservation.consulting_fee,
-        google_meet_link: reservation.google_meet_link,
-        mode: reservation.mode,
-        status: "예약완료", // 재예약 시 상태를 "예약완료"로 설정
-      });
-
-      if (response.status === 200) {
-        alert("재예약이 완료되었습니다.");
-        navigate(PATH.reservationList);
-      }
-    } catch (error) {
-      console.error("재예약 실패:", error);
-      alert("재예약에 실패했습니다. 다시 시도해주세요.");
-    }
+    navigate(PATH.designerDetail(reservation.designer_id));
   };
 
   return (
@@ -142,10 +122,12 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
       </article>
       <div className="border border-gray-scale-200 rounded text-sm text-gray-scale-400 p-2 mb-3 text-center">
         {reservation.mode === "대면" && designer.shop_address}
-        {reservation.mode === "비대면" &&
+        {!isReReservation &&
+          reservation.mode === "비대면" &&
           (isWithin30Minutes(reservation.reservation_date_time)
             ? googleMeetLink || "구글 미트 링크를 생성 중입니다..."
             : "구글 미트 링크는 30분 전에 생성됩니다.")}
+        {isReReservation && "이용이 완료되었습니다."}
       </div>
 
       {/* 재예약 상태인 경우 재예약 버튼 표시, 그렇지 않으면 예약 취소 버튼 표시 */}
@@ -181,7 +163,7 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
                 onClick={handleCancelReservation}
                 className="w-24 bg-gray-scale-100 py-2 text-sub-body1 text-gray-scale-400 rounded-lg"
               >
-                취소
+                네
               </button>
               <DialogClose className="w-24  py-2 text-sub-body1 bg-purple-500 text-purple-100 rounded-lg">
                 아니오

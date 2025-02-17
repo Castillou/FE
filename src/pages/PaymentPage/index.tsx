@@ -1,42 +1,70 @@
-import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { paymentApi } from '../../services/paymentApi';
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { paymentApi } from "../../services/paymentApi";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PATH } from '@/constants/path';
+import { PATH } from "@/constants/path";
+import { formatReservationDate } from "@/utils/dayFormat";
+import devApi from "@/config/axiosDevConfig";
+
+const user_id = "67ab499ba706f516fb348ddd";
 
 const PaymentPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMethod, setSelectedMethod] = useState<'BANK' | 'KAKAO' | null>(null);
-  const location = useLocation();
-  const reservationId = location.state?.reservationId;
+  const [selectedMethod, setSelectedMethod] = useState<"BANK" | "KAKAO" | null>(null);
+  const { state } = useLocation();
+  const reservationData = state?.reservationData;
   const navigate = useNavigate();
   const [agreements, setAgreements] = useState({
     all: false,
     agree1: false,
     agree2: false,
     agree3: false,
-    agree4: false
+    agree4: false,
   });
 
+  // 예약 처리
+  const handleReservation = async () => {
+    try {
+      const response = await devApi.post("/reservation/create", {
+        reservation_id: "생성된 예약 아이디",
+        designer_id: reservationData.designer_id,
+        user_id: user_id, // 로그인 후 호출해서 가져와야함
+        reservation_date_time: state.selectedDate,
+        consulting_fee: state.servicePrice,
+        google_meet_link: "",
+        mode: reservationData.selectedMode,
+        status: "입금 확인 중",
+      });
+
+      if (response.status === 200) {
+        alert("예약이 완료되었습니다.");
+        navigate(PATH.paymentBankTransfer, { state: state });
+      }
+    } catch (error) {
+      console.error("예약 실패:", error);
+      alert("예약에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
+
   const handlePayment = async () => {
-    if (selectedMethod === 'BANK') {
-      navigate(PATH.paymentBankTransfer);
+    if (selectedMethod === "BANK") {
+      handleReservation();
       return;
     }
     try {
       setLoading(true);
       const readyResponse = await paymentApi.ready({
-        reservation_id: reservationId,
+        reservation_id: reservationData.reservationId,
         user_id: "test-user",
         payment_method: "KAKAO_PAY",
         amount: 40000,
-        status: "pending"
+        status: "pending",
       });
 
-      localStorage.setItem('tid', readyResponse.tid);
-      localStorage.setItem('order_id', readyResponse.payment_id);
+      localStorage.setItem("tid", readyResponse.tid);
+      localStorage.setItem("order_id", readyResponse.payment_id);
 
       // 모바일 디바이스 체크
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -44,13 +72,17 @@ const PaymentPage = () => {
       );
 
       // 디바이스 타입에 따라 적절한 URL 선택
-      const redirectUrl = isMobile 
-        ? readyResponse.next_redirect_mobile_url 
+      const redirectUrl = isMobile
+        ? readyResponse.next_redirect_mobile_url
         : readyResponse.next_redirect_pc_url;
 
       window.location.href = redirectUrl;
     } catch (error) {
-      setError(`결제 준비 중 오류가 발생했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
+      setError(
+        `결제 준비 중 오류가 발생했습니다: ${
+          error instanceof Error ? error.message : "알 수 없는 오류"
+        }`
+      );
     } finally {
       setLoading(false);
     }
@@ -63,7 +95,7 @@ const PaymentPage = () => {
       agree1: checked,
       agree2: checked,
       agree3: checked,
-      agree4: checked
+      agree4: checked,
     });
   };
 
@@ -71,17 +103,17 @@ const PaymentPage = () => {
     const { name, checked } = e.target;
     const newAgreements = {
       ...agreements,
-      [name]: checked
+      [name]: checked,
     };
-    
+
     // 모든 항목이 체크되었는지 확인
     const allChecked = Object.keys(newAgreements)
-      .filter(key => key !== 'all')
-      .every(key => newAgreements[key as keyof typeof newAgreements]);
-    
+      .filter((key) => key !== "all")
+      .every((key) => newAgreements[key as keyof typeof newAgreements]);
+
     setAgreements({
       ...newAgreements,
-      all: allChecked
+      all: allChecked,
     });
   };
 
@@ -90,19 +122,19 @@ const PaymentPage = () => {
   }
 
   return (
-    <div className="min-h-dvh bg-gray-50 pb-[76px]">
+    <div className="min-h-dvh">
       <h1 className="text-xl font-medium p-4 text-center border-b">결제</h1>
-      
+
       <div className="px-6">
         {/* 예약 정보 */}
         <Card className="rounded-none bg-gray-100 mt-4">
           <CardContent className="p-4">
             <h2 className="font-medium mb-2">예약정보</h2>
             <div className="space-y-2 text-sm text-gray-600">
-              <div>대면/비대면 예약</div>
-              <div>디자이너 이름 : 헤르츠 컨설턴트</div>
-              <div>일정: 2025년 2월 21일 오전 11:30</div>
-              <div>가격: 40,000원</div>
+              <div>{reservationData.selectedMode}</div>
+              <div>디자이너 이름 : {reservationData.name}</div>
+              <div>일정: {formatReservationDate(state.selectedDate)}</div>
+              <div>가격: {Intl.NumberFormat("ko-KR").format(Number(state.servicePrice))}원</div>
             </div>
           </CardContent>
         </Card>
@@ -123,25 +155,25 @@ const PaymentPage = () => {
           <CardContent className="p-4">
             <h2 className="font-medium mb-2">결제수단</h2>
             <div className="space-y-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className={`w-full justify-start h-12 transition-all ${
-                  selectedMethod === 'BANK' 
-                    ? 'border-2 border-black bg-gray-50' 
-                    : 'border border-gray-200'
+                  selectedMethod === "BANK"
+                    ? "border-2 border-black bg-gray-50"
+                    : "border border-gray-200"
                 }`}
-                onClick={() => setSelectedMethod('BANK')}
+                onClick={() => setSelectedMethod("BANK")}
               >
                 계좌이체
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className={`w-full justify-start h-12 transition-all ${
-                  selectedMethod === 'KAKAO' 
-                    ? 'border-2 border-black bg-gray-50' 
-                    : 'border border-gray-200'
+                  selectedMethod === "KAKAO"
+                    ? "border-2 border-black bg-gray-50"
+                    : "border border-gray-200"
                 }`}
-                onClick={() => setSelectedMethod('KAKAO')}
+                onClick={() => setSelectedMethod("KAKAO")}
               >
                 카카오페이
               </Button>
@@ -155,12 +187,12 @@ const PaymentPage = () => {
             <div className="space-y-3">
               {/* 전체 동의 */}
               <div className="flex items-center gap-2">
-                <input 
-                  type="checkbox" 
-                  id="agreeAll" 
+                <input
+                  type="checkbox"
+                  id="agreeAll"
                   checked={agreements.all}
                   onChange={handleAllCheck}
-                  className="w-4 h-4" 
+                  className="w-4 h-4"
                 />
                 <label htmlFor="agreeAll" className="text-sm font-medium">
                   전체 동의하기
@@ -171,13 +203,13 @@ const PaymentPage = () => {
               <div className="space-y-2 pt-2 border-t">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <input 
-                      type="checkbox" 
-                      id="agree1" 
+                    <input
+                      type="checkbox"
+                      id="agree1"
                       name="agree1"
                       checked={agreements.agree1}
                       onChange={handleSingleCheck}
-                      className="w-4 h-4" 
+                      className="w-4 h-4"
                     />
                     <label htmlFor="agree1" className="text-xs text-gray-600">
                       상기 결제 내역을 확인, 결제 진행에 동의
@@ -187,13 +219,13 @@ const PaymentPage = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <input 
-                      type="checkbox" 
-                      id="agree2" 
+                    <input
+                      type="checkbox"
+                      id="agree2"
                       name="agree2"
                       checked={agreements.agree2}
                       onChange={handleSingleCheck}
-                      className="w-4 h-4" 
+                      className="w-4 h-4"
                     />
                     <label htmlFor="agree2" className="text-xs text-gray-600">
                       [필수] 개인정보수집 동의
@@ -204,13 +236,13 @@ const PaymentPage = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <input 
-                      type="checkbox" 
-                      id="agree3" 
+                    <input
+                      type="checkbox"
+                      id="agree3"
                       name="agree3"
                       checked={agreements.agree3}
                       onChange={handleSingleCheck}
-                      className="w-4 h-4" 
+                      className="w-4 h-4"
                     />
                     <label htmlFor="agree3" className="text-xs text-gray-600">
                       [필수] 제3자 정보제공 동의
@@ -221,13 +253,13 @@ const PaymentPage = () => {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <input 
-                      type="checkbox" 
-                      id="agree4" 
+                    <input
+                      type="checkbox"
+                      id="agree4"
                       name="agree4"
                       checked={agreements.agree4}
                       onChange={handleSingleCheck}
-                      className="w-4 h-4" 
+                      className="w-4 h-4"
                     />
                     <label htmlFor="agree4" className="text-xs text-gray-600">
                       [필수] 위수탁/번영/환불 수수료 동의
@@ -246,14 +278,16 @@ const PaymentPage = () => {
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-xs text-gray-500">총 결제금액</span>
-            <span className="text-lg font-bold">40,000원</span>
+            <span className="text-lg font-bold">
+              {Intl.NumberFormat("ko-KR").format(Number(state.servicePrice))}원
+            </span>
           </div>
-          <Button 
+          <Button
             className="w-[120px] h-12 bg-black hover:bg-gray-800"
             onClick={handlePayment}
             disabled={loading}
           >
-            {loading ? '처리중...' : '결제하기'}
+            {loading ? "처리중..." : "결제하기"}
           </Button>
         </div>
       </div>

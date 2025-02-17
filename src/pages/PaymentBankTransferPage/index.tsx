@@ -1,13 +1,15 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PATH } from "@/constants/path";
 
 const PaymentBankTransferPage = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
+  console.log(state);
 
   return (
-    <div className="min-h-dvh bg-gray-50">
+    <div className="min-h-dvh">
       <h1 className="text-xl font-medium p-4 text-center border-b">계좌이체 안내</h1>
 
       <div className="px-6">
@@ -24,7 +26,9 @@ const PaymentBankTransferPage = () => {
             <div className="space-y-4 text-sm">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">입금 금액</span>
-                <span className="font-bold text-lg">40,000원</span>
+                <span className="font-bold text-lg">
+                  {Intl.NumberFormat("ko-KR").format(Number(state.servicePrice))}원
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">입금 계좌</span>
@@ -32,7 +36,7 @@ const PaymentBankTransferPage = () => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">예금주</span>
-                <span className="font-medium">할마리</span>
+                <span className="font-medium">할머리</span>
               </div>
               <div className="mt-4 p-3 bg-white rounded text-sm text-gray-600">
                 ※ 예약자 성함과 동일한 이름으로 입금해 주세요.
