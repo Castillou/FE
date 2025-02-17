@@ -9,9 +9,13 @@ export const getDesignerList = async (filterOptions: FilterOptions) => {
       params: {
         region: filterOptions.designer_location,
         available_modes: filterOptions.designer_mode,
+        min_consulting_fee: filterOptions.min_consulting_fee,
+        max_consulting_fee: filterOptions.max_consulting_fee,
       },
       paramsSerializer: (params) => qs.stringify(params, { arrayFormat: "repeat" }),
     });
+    console.log(response.data.designer_list);
+
     return response.data.designer_list;
   } catch (error) {
     // 추후 에러 핸들링 필요

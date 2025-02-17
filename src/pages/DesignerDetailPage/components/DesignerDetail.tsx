@@ -90,7 +90,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
           <p className="font-bold mb-[10px]">전문분야</p>
           <div>
             <div className="bg-[#F6E7FF] rounded-full px-[13px] py-[2px] inline-block">
-              <span className="text-[11px] text-[#B434FF] whitespace-nowrap">
+              <span className="text-[11px] text-primary-200 whitespace-nowrap">
                 {data?.specialties} 전문
               </span>
             </div>
@@ -107,7 +107,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
 
         <div>
           <Button
-            className="bg-[#B434FF] text-white w-full text-[20px] font-bold py-[14px] h-[50px] transition-colors duration-200 hover:bg-[#9929CC]"
+            className="bg-primary-200 text-white w-full text-[20px] font-bold py-[14px] h-[50px] transition-colors duration-200 hover:bg-primary-300"
             onClick={() => setOpen(true)}
           >
             예약하기
@@ -118,20 +118,22 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerContent className="min-w-[375px] max-w-[430px] m-auto px-[18px] pb-[18px]">
           <DrawerHeader>
-            <DrawerTitle className="text-[16px] font-bold">컨설팅 방식</DrawerTitle>
-            <DrawerDescription className="text-[12px] text-[#868686] leading-4">
-              소요시간 약 30분
-              <br />
-              컨설팅 내용은 진행 후 요약된 리포트로 고객에게 전달됩니다.
+            <DrawerTitle className="text-[16px] font-bold text-left">컨설팅 방식</DrawerTitle>
+            <DrawerDescription>
+              <div className="text-[12px] text-[#868686] leading-4 text-left">
+                소요시간 약 30분
+                <br />
+                컨설팅 내용은 진행 후 요약된 리포트로 고객에게 전달됩니다.
+              </div>
             </DrawerDescription>
           </DrawerHeader>
 
           <div className="flex gap-2 text-center pb-[30px]">
             {availableModes?.includes("대면") ? (
               <div
-                className={`py-4 px-4 w-[50%] cursor-pointer flex items-center justify-center flex-col ${
+                className={`py-4 px-4 w-[50%] cursor-pointer flex items-center justify-center flex-col rounded-md ${
                   reservationData?.selectedMode === "대면"
-                    ? "bg-[#B434FF] text-white"
+                    ? "bg-primary-200 text-white"
                     : "bg-[#F0F0F0]"
                 }`}
                 onClick={() => {
@@ -144,7 +146,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
             ) : (
               <div
                 className={
-                  "py-4 px-4 w-[50%] cursor-pointer bg-[#F0F0F0] flex items-center justify-center flex-col"
+                  "py-4 px-4 w-[50%] cursor-pointer bg-[#F0F0F0] flex items-center justify-center flex-col rounded-md"
                 }
               >
                 <p className="text-[14px]">비대면만 가능합니다</p>
@@ -153,9 +155,9 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
 
             {availableModes?.includes("비대면") ? (
               <div
-                className={`py-4 px-4 w-[50%] cursor-pointer flex items-center justify-center flex-col ${
+                className={`py-4 px-4 w-[50%] cursor-pointer flex items-center justify-center flex-col rounded-md ${
                   reservationData?.selectedMode === "비대면"
-                    ? "bg-[#B434FF] text-white"
+                    ? "bg-primary-200 text-white"
                     : "bg-[#F0F0F0]"
                 }`}
                 onClick={() => {
@@ -163,12 +165,12 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
                 }}
               >
                 <p className="text-[14px]">비대면</p>
-                <p className="text-[12px]">{data?.face_consulting_fee.toLocaleString()}원~</p>
+                <p className="text-[12px]">{data?.non_face_consulting_fee.toLocaleString()}원~</p>
               </div>
             ) : (
               <div
                 className={
-                  "py-4 px-4 w-[50%] cursor-pointer bg-[#F0F0F0] flex items-center justify-center flex-col"
+                  "py-4 px-4 w-[50%] cursor-pointer bg-[#F0F0F0] flex items-center justify-center flex-col rounded-md"
                 }
               >
                 <p className="text-[14px]">대면만 가능합니다</p>
@@ -178,7 +180,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
 
           <DrawerFooter className="h-[88px] bg-white">
             <Button
-              className="bg-[#B434FF] text-white w-full text-[20px] font-bold py-[14px] h-[50px] transition-colors duration-200 hover:bg-[#9929CC] disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="bg-primary-200 text-white w-full text-[20px] font-bold py-[14px] h-[50px] transition-colors duration-200 hover:bg-primary-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
               disabled={!reservationData?.selectedMode}
               onClick={goToReservation}
             >
