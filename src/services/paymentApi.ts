@@ -1,4 +1,4 @@
-import axios from 'axios';
+import devApi from "@/config/axiosDevConfig";
 import { PaymentReadyRequest, PaymentReadyResponse, PaymentApproveRequest, PaymentInfo } from '../types/payment';
 
 const BASE_URL = 'https://harmari.duckdns.org';
@@ -10,23 +10,23 @@ interface PayReadyResponse {
 
 export const paymentApi = {
   ready: async (data: PaymentReadyRequest): Promise<PaymentReadyResponse> => {
-    const response = await axios.post(`${BASE_URL}/payments/ready`, data);
+    const response = await devApi.post(`${BASE_URL}/payments/ready`, data);
     return response.data;
   },
 
   approve: async (data: PaymentApproveRequest): Promise<PaymentInfo> => {
-    const response = await axios.post(`${BASE_URL}/payments/approve`, data);
+    const response = await devApi.post(`${BASE_URL}/payments/approve`, data);
     return response.data;
   },
 
   cancel: async (data: { payment_id: string; cancel_reason: string; cancel_amount: number }): Promise<PaymentInfo> => {
-    const response = await axios.post(`${BASE_URL}/payments/cancel`, data);
+    const response = await devApi.post(`${BASE_URL}/payments/cancel`, data);
     return response.data;
   },
 
   // 테스트용 reservation 생성
   payReady: async (): Promise<PayReadyResponse> => {
-    const response = await axios.get(`${BASE_URL}/reservation/pay_ready`);
+    const response = await devApi.get(`${BASE_URL}/reservation/pay_ready`);
     return response.data;
   },
 };

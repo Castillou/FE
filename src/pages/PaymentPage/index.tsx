@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getUserMe } from "@/apis/user"; // new import
+import { ReservationCreate } from "@/apis/reservation"; // new import
 import { paymentApi } from "../../services/paymentApi";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PATH } from "@/constants/path";
 import { formatReservationDate } from "@/utils/dayFormat";
-import devApi from "@/config/axiosDevConfig";
-
-const user_id = "67ab499ba706f516fb348ddd";
 
 const PaymentPage = () => {
+  // Removed hardcoded user_id
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<"BANK" | "KAKAO" | null>(null);
@@ -24,65 +25,41 @@ const PaymentPage = () => {
     agree4: false,
   });
 
-  // 예약 처리
-  const handleReservation = async () => {
-    try {
-      const response = await devApi.post("/reservation/create", {
-        reservation_id: "생성된 예약 아이디",
-        designer_id: reservationData.designer_id,
-        user_id: user_id, // 로그인 후 호출해서 가져와야함
-        reservation_date_time: state.selectedDate,
-        consulting_fee: state.servicePrice,
-        google_meet_link: "",
-        mode: reservationData.selectedMode,
-        status: "입금 확인 중",
-      });
-
-      if (response.status === 200) {
-        alert("예약이 완료되었습니다.");
-        navigate(PATH.paymentBankTransfer, { state: state });
-      }
-    } catch (error) {
-      console.error("예약 실패:", error);
-      alert("예약에 실패했습니다. 다시 시도해주세요.");
-    }
-  };
-
   const handlePayment = async () => {
-    if (selectedMethod === "BANK") {
-      handleReservation();
-      return;
-    }
     try {
       setLoading(true);
+
+      const userInfo = await getUserMe();
+
       const readyResponse = await paymentApi.ready({
         reservation_id: reservationData.reservationId,
-        user_id: "test-user",
-        payment_method: "KAKAO_PAY",
+        user_id: userInfo.user_id,
+        payment_method: selectedMethod === "BANK" ? "BANK" : "KAKAO_PAY",
         amount: 40000,
         status: "pending",
       });
 
+
       localStorage.setItem("tid", readyResponse.tid);
       localStorage.setItem("order_id", readyResponse.payment_id);
 
-      // 모바일 디바이스 체크
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      );
 
-      // 디바이스 타입에 따라 적절한 URL 선택
-      const redirectUrl = isMobile
-        ? readyResponse.next_redirect_mobile_url
-        : readyResponse.next_redirect_pc_url;
+      await ReservationCreate({
+        reservation_id: reservationData.reservationId,
+        designer_id: "",
+        user_id: userInfo.user_id,
+        reservation_date_time: state.selectedDate,
+        consulting_fee: state.servicePrice,
+        google_meet_link: "",
+        mode: reservationData.selectedMode,
+        status: "예약완료",
+      });
 
-      window.location.href = redirectUrl;
+      // Navigate to the success page
+      navigate(PATH.payments, { state: { reservationId: reservationData.reservationId } });
     } catch (error) {
-      setError(
-        `결제 준비 중 오류가 발생했습니다: ${
-          error instanceof Error ? error.message : "알 수 없는 오류"
-        }`
-      );
+      console.error("예약 실패:", error);
+      alert("예약에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
