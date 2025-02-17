@@ -31,10 +31,12 @@ const PaymentPreparePage = () => {
       // Pass the captured values along with reservationId
       navigate(PATH.payments, { 
         state: { 
-          reservationId,
-          selectedDate: formattedDate,
-          servicePrice,
-          selectedMode,
+          reservationData: {
+            reservationId,
+            selectedDate: formattedDate,
+            servicePrice,
+            selectedMode,
+          }
         } 
       });
     } catch {
