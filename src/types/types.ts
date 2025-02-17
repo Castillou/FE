@@ -1,4 +1,4 @@
-import { Designer } from "./apiTypes";
+import { DesignerDetailResponse } from "./apiTypes";
 
 // 타입 정의
 export type DesignerMode = "대면" | "비대면" | "대면, 비대면";
@@ -15,6 +15,12 @@ export type FilterOptions = {
   max_consulting_fee?: number;
 };
 
-export interface ReservationData extends Designer {
-  selectedMode: DesignerMode | null;
+export interface ReservationData extends DesignerDetailResponse {
+  selectedMode: DesignerMode;
+}
+
+export interface PaymentsData extends DesignerDetailResponse {
+  selectedMode: DesignerMode;
+  servicePrice: number;
+  selectedDateTime: Date;
 }

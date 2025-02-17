@@ -1,6 +1,6 @@
 import { getDesignerDetail } from "@/apis/designerDetail";
 import { Button } from "@/components/ui/button";
-import { Designer } from "@/types/apiTypes";
+import { DesignerDetailResponse } from "@/types/apiTypes";
 import { useEffect, useState } from "react";
 import {
   Drawer,
@@ -21,7 +21,7 @@ interface DesignerDetailProps {
 const DesignerDetail = ({ id }: DesignerDetailProps) => {
   const navigate = useNavigate();
 
-  const [data, setData] = useState<Designer | null>(null);
+  const [data, setData] = useState<DesignerDetailResponse | null>(null);
   const [open, setOpen] = useState(false);
   const [reservationData, setReservationData] = useState<ReservationData | null>(null);
 

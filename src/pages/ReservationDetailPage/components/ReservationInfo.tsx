@@ -6,7 +6,7 @@ import QUERY_KEY from "@/constants/queryKey";
 import { cn } from "@/lib/utils";
 import { Reservation } from "@/types/apiTypes";
 import { formatReservationDate, isWithin30Minutes } from "@/utils/dayFormat";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -26,6 +26,7 @@ interface ReservationInfoProps {
 }
 
 const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [googleMeetLink, setGoogleMeetLink] = useState<string | null>(null);
 
@@ -77,11 +78,13 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
 
   // 예약 취소 처리
   const handleCancelReservation = async () => {
-    const response = await reservationCancel(reservation.id);
-    if (response.status === 200) {
-      alert("예약취소 되었습니다.");
-      navigate(PATH.reservationList);
-    }
+    await reservationCancel(reservation.id);
+
+    await queryClient.invalidateQueries({
+      queryKey: ["reservationList"],
+    });
+
+    navigate(PATH.reservationList);
   };
 
   // 재예약 처리
@@ -121,7 +124,7 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
         </span>
       </article>
       <div className="border border-gray-scale-200 rounded text-sm text-gray-scale-400 p-2 mb-3 text-center">
-        {reservation.mode === "대면" && designer.shop_address}
+        {reservation.mode === "대면" && designer?.shop_address}
         {!isReReservation &&
           reservation.mode === "비대면" &&
           (isWithin30Minutes(reservation.reservation_date_time)
