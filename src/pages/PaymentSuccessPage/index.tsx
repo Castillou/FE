@@ -12,6 +12,7 @@ import devApi from "@/config/axiosDevConfig";
 import { RESERVATION_ENDPOINT } from "@/apis/endpoints";
 import { DesignerDetailResponse } from "@/types/apiTypes";
 import { getDesignerDetail } from "@/apis/designerDetail";
+import { formatReservationDate } from "@/utils/dayFormat";
 
 interface PaymentInfo {
   amount: number;
@@ -199,7 +200,7 @@ const PaymentSuccessPage = () => {
       <Card className="border-0 shadow-none px-6">
         <CardHeader className="p-4 pb-2">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold">{reservationPayload.designer_id}</h2>
+            <h2 className="text-lg font-bold">{designerInfo?.name || "디자이너 정보 없음"}</h2>
             <span className="px-3 py-1 text-xs text-[#B434FF] bg-[rgba(216,150,255,0.25)] rounded-full">
               {reservationPayload.mode}
             </span>
@@ -209,14 +210,7 @@ const PaymentSuccessPage = () => {
           <div className="flex">
             <span className="text-[14px] text-gray-400 w-24">일정</span>
             <span className="text-[14px] text-gray-700">
-              {new Date(reservationPayload.reservation_date_time).toLocaleString("ko-KR", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                weekday: "long",
-                hour: "numeric",
-                minute: "numeric",
-              })}
+              {formatReservationDate(reservationPayload.reservation_date_time)}
             </span>
           </div>
 
@@ -234,7 +228,9 @@ const PaymentSuccessPage = () => {
           ) : (
             <div className="flex">
               <span className="text-[14px] text-gray-400 w-24">매장 정보</span>
-              <span className="text-[14px] text-gray-700">{designerInfo?.shop_address}</span>
+              <span className="text-[14px] text-gray-700">
+                {designerInfo?.shop_address || "매장 정보 없음"}
+              </span>
               <button
                 className="text-[14px] text-[#0C63D0]"
                 onClick={() => {
@@ -260,29 +256,22 @@ const PaymentSuccessPage = () => {
       {/* 가격 정보 */}
       <Card className="border-0 shadow-none px-6">
         <CardContent className="p-4">
-          <div className="relative">
-            <div className="border-t border-[#C3C3C3] w-full absolute top-0" />
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-[16px] font-semibold text-black">가격</span>
-              <span className="text-[16px] font-semibold text-[#D896FF]">
-                {Number(reservationPayload.consulting_fee).toLocaleString()}원
-              </span>
-            </div>
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-[16px] font-semibold text-black">가격</span>
+            <span className="text-[16px] font-semibold text-[#D896FF]">
+              {paymentInfo?.amount?.toLocaleString()}원
+            </span>
           </div>
         </CardContent>
       </Card>
 
       {/* 하단 버튼 */}
-      <div className="absolute w-[318px] h-[48px] left-[20px] top-[444px]">
+      <div>
         <div className="flex gap-[10px]">
           <Button
             variant="outline"
             className="flex justify-center items-center w-[155px] h-[48px] px-5 py-[5px] bg-white border border-[#D896FF] rounded-[12px] text-[#D896FF] font-semibold text-base leading-[21px] tracking-[-0.04em]"
-            onClick={() =>
-              paymentInfo?.reservation_id
-                ? navigate(PATH.reservationDetail(paymentInfo?.reservation_id))
-                : navigate(PATH.reservationList)
-            }
+            onClick={() => navigate(PATH.reservationList)}
           >
             예약확인
           </Button>
