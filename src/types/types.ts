@@ -11,8 +11,8 @@ export type FilterOptions = {
   designer_location?: DesignerLocation[];
   designer_pricer?: string;
   designer_mode?: DesignerFilterMode;
-  min_consulting_fee?: number;
-  max_consulting_fee?: number;
+  min_consulting_fee: number;
+  max_consulting_fee: number;
 };
 
 export interface ReservationData extends DesignerDetailResponse {

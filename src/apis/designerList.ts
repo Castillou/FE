@@ -14,11 +14,10 @@ export const getDesignerList = async (filterOptions: FilterOptions) => {
       },
       paramsSerializer: (params) => qs.stringify(params, { arrayFormat: "repeat" }),
     });
-    console.log(response.data.designer_list);
 
     return response.data.designer_list;
   } catch (error) {
-    // 추후 에러 핸들링 필요
-    console.log(error);
+    console.error("디자이너 상세 정보 불러오기 실패:", error);
+    throw error;
   }
 };

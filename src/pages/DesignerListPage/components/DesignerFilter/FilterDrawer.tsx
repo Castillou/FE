@@ -25,7 +25,7 @@ const FilterDrawer = ({
     designer_mode: undefined,
     designer_location: ["서울 전체"],
     min_consulting_fee: 0,
-    max_consulting_fee: 50000,
+    max_consulting_fee: 40000,
   });
 
   useEffect(() => {
@@ -56,9 +56,18 @@ const FilterDrawer = ({
     setIsDrawerOpen(false);
   };
 
+  const resetFilterOptions = () => {
+    setSelectedOption({
+      designer_mode: undefined,
+      designer_location: ["서울 전체"],
+      min_consulting_fee: 0,
+      max_consulting_fee: 40000,
+    });
+  };
+
   return (
     <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-      <DrawerContent className="min-w-[375px] max-w-[430px] m-auto px-[18px] pb-[18px]">
+      <DrawerContent className="min-w-[375px] max-w-[430px] m-auto px-[18px] pb-[12px]">
         {/* 필터 */}
         <DesignerFilterDrawer
           selectedOption={selectedOption}
@@ -66,11 +75,17 @@ const FilterDrawer = ({
           handleLocationChange={handleLocationChange}
           handleFeeChange={handleFeeChange}
         />
-        <DrawerFooter>
-          <DrawerClose>
+        <DrawerFooter className="flex flex-row justify-between gap-2 px-0">
+          <Button
+            className="bg-[none] text-[#000] border-none hover:bg-[none]"
+            onClick={resetFilterOptions}
+          >
+            <span>초기화</span>
+          </Button>
+          <DrawerClose className="flex w-full">
             <Button
               variant="outline"
-              className="bg-primary-100 w-full text-white mt-[107px] rounded-[12px]"
+              className="bg-primary-100 w-full text-white"
               onClick={submitFilterOptions}
             >
               {designerList?.length}건의 결과보기

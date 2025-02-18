@@ -17,7 +17,7 @@ const DesignerDetailHeader = () => {
         <div
           className="cursor-pointer"
           onClick={() => {
-            alert("홉 버튼 클릭");
+            navigate(-1);
           }}
         >
           <img src="/images/home-icon.svg" alt="홈" />

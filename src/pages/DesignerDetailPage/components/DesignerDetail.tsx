@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import {
   Drawer,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -13,6 +12,8 @@ import {
 import { DesignerMode, ReservationData } from "@/types/types";
 import { useNavigate } from "react-router-dom";
 import { PATH } from "@/constants/path";
+import Container from "./Container";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface DesignerDetailProps {
   id: string | undefined;
@@ -25,11 +26,16 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
   const [open, setOpen] = useState(false);
   const [reservationData, setReservationData] = useState<ReservationData | null>(null);
 
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   const handleModeSelect = (mode: DesignerMode) => {
     setReservationData(
       (prev) => prev && { ...prev, selectedMode: prev.selectedMode === mode ? null : mode }
     );
   };
+
+  //주파수 지수
+  const frequency = 70;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,18 +53,14 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
           selectedMode: null,
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
 
     fetchData();
   }, [id]);
 
-  console.log(data);
-
   const availableModes = data?.available_modes.split(", ") as DesignerMode[];
-
-  console.log(availableModes);
 
   const goToReservation = () => {
     if (reservationData?.selectedMode) {
@@ -68,26 +70,33 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
 
   return (
     <>
-      <div>
-        <img
-          src="https://placehold.co/393x250?text=haertz"
-          alt="designer image"
-          className="object-cover rounded-md w-full"
-        />
-      </div>
+      <div className="px-5 pt-[25px] bg-white">
+        <div className="flex justify-between items-center mb-[12px]">
+          <div>
+            <p className="text-[20px] font-bold mb-[6px]">{data?.name}</p>
+            <p className="text-[14px] text-[#676767]">{data?.introduction}</p>
+          </div>
+          <img
+            src="https://placehold.co/53x53?text=haertz"
+            alt="designer image"
+            className="object-cover rounded-full"
+          />
+        </div>
 
-      <div className="px-7 pt-[25px] bg-white">
-        <div className="flex justify-between items-center mb-[22px]">
-          <div className="text-[20px] font-bold">{data?.name}</div>
-          <div className="cursor-pointer" onClick={() => alert("좋아요 기능 준비중입니다.")}>
-            <img src="/images/heart-icon.svg" alt="좋아요" />
+        <div className="mb-[85px]">
+          <h4 className="text-[12px] text-primary-200">주파수 지수</h4>
+          <div className="bg-primary-100/20 h-[10px] w-full relative">
+            <div
+              className="absolute top-0 left-0 h-full bg-primary-100 w-[50%]"
+              style={{ width: `${frequency}%` }}
+            ></div>
           </div>
         </div>
 
         <div className="text-[14px] text-[#676767] mb-[22px]">{data?.introduction}</div>
 
         <div className="mb-[22px]">
-          <p className="font-bold mb-[10px]">전문분야</p>
+          <h4 className="font-bold mb-[10px]">전문분야</h4>
           <div>
             <div className="bg-[#F6E7FF] rounded-full px-[13px] py-[2px] inline-block">
               <span className="text-[11px] text-primary-200 whitespace-nowrap">
@@ -97,13 +106,47 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
           </div>
         </div>
 
-        <div className="mb-[185px]">
+        <div className="pb-[35px] border-b border-[#F0F0F0] mb-[27px]">
           <p className="font-bold mb-[10px]">샵 주소</p>
           <div className="px-4 py-[10px] border border-[#F0F0F0] rounded-[6px] flex items-center gap-[10px]">
             <img src="/images/pointer-icon.svg" alt="위치" />
             <p className="text-[14px] text-[#676767]">{data?.shop_address}</p>
           </div>
         </div>
+
+        <div className="mb-[73px]">
+          <h4 className="font-bold mb-[10px]">포트폴리오</h4>
+
+          <Container>
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="embla__slide flex-[0_0_auto] min-w-0 mr-[9px] cursor-pointer"
+                onClick={() =>
+                  setSelectedImage(`https://placehold.co/82x147?text=haertz ${index + 1}`)
+                }
+              >
+                <img
+                  src={`https://placehold.co/82x147?text=haertz ${index + 1}`}
+                  alt={`portfolio image ${index + 1}`}
+                  className="object-cover w-[82px] h-[147px]"
+                />
+              </div>
+            ))}
+          </Container>
+        </div>
+
+        <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+          <DialogContent className="p-0 overflow-hidden">
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt="확대된 이미지"
+                className="w-full h-full object-contain"
+              />
+            )}
+          </DialogContent>
+        </Dialog>
 
         <div>
           <Button
@@ -117,63 +160,64 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
 
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerContent className="min-w-[375px] max-w-[430px] m-auto px-[18px] pb-[18px]">
-          <DrawerHeader>
-            <DrawerTitle className="text-[16px] font-bold text-left">컨설팅 방식</DrawerTitle>
-            <DrawerDescription>
-              <div className="text-[12px] text-[#868686] leading-4 text-left">
-                소요시간 약 30분
-                <br />
-                컨설팅 내용은 진행 후 요약된 리포트로 고객에게 전달됩니다.
-              </div>
-            </DrawerDescription>
+          <DrawerHeader className="pb-4 pl-0">
+            <DrawerTitle className="text-[16px] font-bold text-left">
+              컨설팅 방식을 선택해주세요.
+            </DrawerTitle>
           </DrawerHeader>
 
-          <div className="flex gap-2 text-center pb-[30px]">
+          <div className="flex flex-col gap-[10px] mb-1">
             {availableModes?.includes("대면") ? (
               <div
-                className={`py-4 px-4 w-[50%] cursor-pointer flex items-center justify-center flex-col rounded-md ${
+                className={`p-3 cursor-pointer rounded-md border ${
                   reservationData?.selectedMode === "대면"
-                    ? "bg-primary-200 text-white"
+                    ? "border border-primary-100 bg-secondary-100"
                     : "bg-[#F0F0F0]"
                 }`}
                 onClick={() => {
                   handleModeSelect("대면");
                 }}
               >
-                <p className="text-[14px]">대면</p>
-                <p className="text-[12px]">{data?.face_consulting_fee.toLocaleString()}원~</p>
+                <span className="text-[16px] font-bold">대면 </span>
+                <span className="text-[16px]">{data?.face_consulting_fee.toLocaleString()}원</span>
+                <p className="text-[10px] text-gray-scale-300">실제 샵에 방문하여 컨설팅 진행</p>
               </div>
             ) : (
               <div
                 className={
-                  "py-4 px-4 w-[50%] cursor-pointer bg-[#F0F0F0] flex items-center justify-center flex-col rounded-md"
+                  "p-3 min-h-[65px] cursor-pointer bg-[#F0F0F0] flex items-center rounded-md"
                 }
               >
-                <p className="text-[14px]">비대면만 가능합니다</p>
+                <span className="text-[14px] font-bold">비대면만 가능합니다</span>
               </div>
             )}
 
             {availableModes?.includes("비대면") ? (
               <div
-                className={`py-4 px-4 w-[50%] cursor-pointer flex items-center justify-center flex-col rounded-md ${
+                className={`p-3 cursor-pointer rounded-md border ${
                   reservationData?.selectedMode === "비대면"
-                    ? "bg-primary-200 text-white"
+                    ? "border border-primary-100 bg-secondary-100"
                     : "bg-[#F0F0F0]"
                 }`}
                 onClick={() => {
                   handleModeSelect("비대면");
                 }}
               >
-                <p className="text-[14px]">비대면</p>
-                <p className="text-[12px]">{data?.non_face_consulting_fee.toLocaleString()}원~</p>
+                <span className="text-[16px] font-bold">비대면 </span>
+                <span className="text-[16px]">
+                  {data?.non_face_consulting_fee.toLocaleString()}원
+                </span>
+                <p className="text-[10px] text-gray-scale-300">
+                  예약 완료 후 Google Meet 링크가 생성되어 화상 컨설팅 진행
+                </p>
               </div>
             ) : (
               <div
                 className={
-                  "py-4 px-4 w-[50%] cursor-pointer bg-[#F0F0F0] flex items-center justify-center flex-col rounded-md"
+                  "p-3 min-h-[65px] cursor-pointer bg-[#F0F0F0] flex items-center rounded-md"
                 }
               >
-                <p className="text-[14px]">대면만 가능합니다</p>
+                <span className="text-[14px] font-bold">대면만 가능합니다</span>
               </div>
             )}
           </div>
@@ -184,7 +228,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
               disabled={!reservationData?.selectedMode}
               onClick={goToReservation}
             >
-              계속하기
+              다음
             </Button>
           </DrawerFooter>
         </DrawerContent>

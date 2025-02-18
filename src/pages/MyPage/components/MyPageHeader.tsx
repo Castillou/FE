@@ -7,7 +7,6 @@ const MyPageHeader = () => {
 
   const handleLogout = async () => {
     const response = await userLogout();
-    console.log(response);
     if (response.message) {
       alert("로그아웃 되었습니다.");
     }

@@ -13,7 +13,7 @@ export default {
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          "300": "#F29B30",
+          "100": "rgba(216, 150, 255, 0.63)",
           "500": "#F85900",
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -23,6 +23,9 @@ export default {
         },
         info: {
           "500": "#1A9EFE",
+        },
+        selected: {
+          default: "#F0F0F0",
         },
         "gray-scale": {
           "0": "#FFFFFF",

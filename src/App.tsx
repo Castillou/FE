@@ -1,10 +1,11 @@
 import { RouterProvider } from "react-router-dom";
 import router from "./routes/router";
+import useAxiosInterceptor from "./hooks/useAxiosInterceptor";
+import devApi from "./config/axiosDevConfig";
 
 function App() {
-  return (
-    <RouterProvider router={router} />
-  )
+  useAxiosInterceptor(devApi);
+  return <RouterProvider router={router} />;
 }
 
 export default App;

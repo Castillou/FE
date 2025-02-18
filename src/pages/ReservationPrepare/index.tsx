@@ -40,6 +40,7 @@ const ReservationPrepare = () => {
   const { state } = useLocation();
   const reservationData: ReservationData = state.reservationData;
   const navigate = useNavigate();
+  const [isChecked, setIsChecked] = useState(false);
 
   const servicePrice =
     reservationData?.selectedMode === "대면"
@@ -75,7 +76,9 @@ const ReservationPrepare = () => {
           .flatMap((slot) => slot.slots)
           .filter((time) => {
             const timeToCheck = dayjs(`${dayjs(date).format("YYYY-MM-DD")} ${time}`);
-            return timeToCheck.isBefore(now); // 현재 시간 이전인지 확인
+
+            const nextTimeToCheck = now.add(30, "minutes").startOf("hour").add(30, "minutes");
+            return timeToCheck.isBefore(nextTimeToCheck); // 현재 시간 + 30분 이전인지 확인
           })
       : [];
 
@@ -169,7 +172,7 @@ const ReservationPrepare = () => {
                     <button
                       key={time}
                       className={cn(
-                        "h-10 rounded-xl bg-[#F4F4F4] text-gray-scale-400",
+                        "h-10 rounded-xl bg-[#F4F4F4] text-gray-scale-400 text-[14px]",
                         selectedTime === time && "bg-[#D896FF] text-white",
                         disabledTimes.includes(time) &&
                           "text-gray-300 line-through cursor-not-allowed"
@@ -187,15 +190,32 @@ const ReservationPrepare = () => {
         </div>
       </div>
 
-      {selectedTime ? (
+      <label
+        className={cn(
+          "border rounded-lg p-3 mt-[36px] mb-2 flex items-center justify-between cursor-pointer",
+          isChecked ? "border-primary-100" : "border-gray-300"
+        )}
+      >
+        <p>
+          당일 예약은 취소가 불가능합니다. <span className="text-primary-100">(필수)</span>
+        </p>
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={(e) => setIsChecked(e.target.checked)}
+          className="w-4 h-4 accent-primary-100 rounded-xl"
+        />
+      </label>
+
+      {selectedTime && isChecked ? (
         <button
-          className="w-full mt-8 py-2 bg-[#D896FF] text-white rounded-lg"
+          className="w-full py-2 bg-[#D896FF] text-white rounded-lg"
           onClick={navigatePaymentPage}
         >
           다음
         </button>
       ) : (
-        <button className="w-full mt-8 py-2 bg-gray-300 text-gray-500 rounded-lg" disabled>
+        <button className="w-full py-2 bg-gray-300 text-gray-500 rounded-lg" disabled>
           다음
         </button>
       )}

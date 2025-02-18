@@ -6,7 +6,6 @@ import { PATH } from "@/constants/path";
 const PaymentBankTransferPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
-  console.log(state);
 
   return (
     <div className="min-h-dvh">

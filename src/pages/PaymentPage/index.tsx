@@ -25,7 +25,6 @@ const PaymentPage = () => {
   //   agree3: false,
   //   agree4: false,
   // });
-  console.log(selectedMethod);
 
   const { data: user } = useQuery({
     queryKey: QUERY_KEY.user.me,
