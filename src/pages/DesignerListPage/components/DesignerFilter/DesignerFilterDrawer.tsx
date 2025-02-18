@@ -15,7 +15,6 @@ const DesignerFilterDrawer = ({
 }) => {
   const [maxData, setMaxData] = useState(selectedOption.max_consulting_fee);
   const [minData, setMinData] = useState(selectedOption.min_consulting_fee);
-
   const locationList = ["서울 전체", "홍대/연남/합정", "강남/청담/압구정", "성수/건대"] as const;
 
   useEffect(() => {
@@ -46,6 +45,8 @@ const DesignerFilterDrawer = ({
             onClick={(e) => {
               e.stopPropagation();
               handleModeChange("대면");
+              setMinData(30000);
+              handleFeeChange(30000, maxData);
             }}
           >
             <span className="text-[16px] font-bold">대면 </span>
@@ -71,6 +72,8 @@ const DesignerFilterDrawer = ({
             onClick={(e) => {
               e.stopPropagation();
               handleModeChange("비대면");
+              setMinData(20000);
+              handleFeeChange(20000, maxData);
             }}
           >
             <span className="text-[16px] font-bold">비대면 </span>
@@ -133,6 +136,7 @@ const DesignerFilterDrawer = ({
               min={0}
               max={50000}
               step={1000}
+              value={[minData, maxData]}
               onValueChange={(value) => {
                 setMinData(value[0]);
                 setMaxData(value[1]);

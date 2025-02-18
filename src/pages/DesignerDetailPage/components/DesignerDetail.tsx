@@ -26,12 +26,18 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
   const [open, setOpen] = useState(false);
   const [reservationData, setReservationData] = useState<ReservationData | null>(null);
 
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
   const handleModeSelect = (mode: DesignerMode) => {
     setReservationData(
       (prev) => prev && { ...prev, selectedMode: prev.selectedMode === mode ? null : mode }
     );
+  };
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+
+  const handleVideoClick = (url: string) => {
+    setSelectedVideo(url);
+    setDialogOpen(true);
   };
 
   //주파수 지수
@@ -77,9 +83,12 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
             <p className="text-[14px] text-[#676767]">{data?.introduction}</p>
           </div>
           <img
-            src="https://placehold.co/53x53?text=haertz"
+            src={data?.profile_image}
+            onError={(e) => {
+              e.currentTarget.src = "https://placehold.co/68x68?text=haertz";
+            }}
             alt="designer image"
-            className="object-cover rounded-full"
+            className="object-cover rounded-md w-[68px] h-[68px]"
           />
         </div>
 
@@ -92,8 +101,6 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
             ></div>
           </div>
         </div>
-
-        <div className="text-[14px] text-[#676767] mb-[22px]">{data?.introduction}</div>
 
         <div className="mb-[22px]">
           <h4 className="font-bold mb-[10px]">전문분야</h4>
@@ -118,32 +125,53 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
           <h4 className="font-bold mb-[10px]">포트폴리오</h4>
 
           <Container>
-            {Array.from({ length: 8 }).map((_, index) => (
+            {[
+              {
+                src: "https://www.youtube.com/embed/vTLOL4vH8qA?controls=0&showinfo=0&rel=0&modestbranding=0&iv_load_policy=3&fs=0&cc_load_policy=0&playsinline=1&mute=1",
+              },
+              {
+                src: "https://www.youtube.com/embed/NXx8-vTI29M?controls=0&showinfo=0&rel=0&modestbranding=0&iv_load_policy=3&fs=0&cc_load_policy=0&playsinline=1&mute=1",
+              },
+              {
+                src: "https://www.youtube.com/embed/e29QHnPOzUE?controls=0&showinfo=0&rel=0&modestbranding=0&iv_load_policy=3&fs=0&cc_load_policy=0&playsinline=1&mute=1",
+              },
+              {
+                src: "https://www.youtube.com/embed/N9eSAvR4e3g?controls=0&showinfo=0&rel=0&modestbranding=0&iv_load_policy=3&fs=0&cc_load_policy=0&playsinline=1&mute=1",
+              },
+              {
+                src: "https://www.youtube.com/embed/QOXfzz8U8sQ?controls=0&showinfo=0&rel=0&modestbranding=0&iv_load_policy=3&fs=0&cc_load_policy=0&playsinline=1&mute=1",
+              },
+            ].map((video, index) => (
               <div
                 key={index}
                 className="embla__slide flex-[0_0_auto] min-w-0 mr-[9px] cursor-pointer"
-                onClick={() =>
-                  setSelectedImage(`https://placehold.co/82x147?text=haertz ${index + 1}`)
-                }
+                onClick={() => handleVideoClick(`${video.src}&autoplay=1`)}
               >
-                <img
-                  src={`https://placehold.co/82x147?text=haertz ${index + 1}`}
-                  alt={`portfolio image ${index + 1}`}
-                  className="object-cover w-[82px] h-[147px]"
-                />
+                <iframe
+                  width="82"
+                  height="147"
+                  src={video.src}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="rounded-md pointer-events-none"
+                  loading="lazy"
+                ></iframe>
               </div>
             ))}
           </Container>
         </div>
 
-        <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-          <DialogContent className="p-0 overflow-hidden">
-            {selectedImage && (
-              <img
-                src={selectedImage}
-                alt="확대된 이미지"
-                className="w-full h-full object-contain"
-              />
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="p-0 overflow-hidden min-w-[350px] max-w-[450px] m-auto">
+            {selectedVideo && (
+              <iframe
+                width="100%"
+                height="600px"
+                src={selectedVideo}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="rounded-md"
+              ></iframe>
             )}
           </DialogContent>
         </Dialog>

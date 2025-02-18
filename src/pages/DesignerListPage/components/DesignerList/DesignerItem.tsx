@@ -25,7 +25,7 @@ const DesignerItem = ({ designer }: DesignerItemProps) => {
             </p>
           </div>
           <div className="flex gap-2">
-            <div className="bg-[#D896FF] rounded-full px-3 py-[2px]">
+            <div className="bg-primary-100 rounded-full px-3 py-[2px]">
               <span className="text-body2 text-white whitespace-nowrap">
                 {designer.specialties} 전문
               </span>
@@ -40,11 +40,19 @@ const DesignerItem = ({ designer }: DesignerItemProps) => {
 
         <div className="flex flex-col items-center justify-between gap-7">
           <img
-            src="https://placehold.co/68x68?text=haertz"
+            src={designer.profile_image}
+            onError={(e) => {
+              e.currentTarget.src = "https://placehold.co/68x68?text=haertz";
+            }}
             alt="designer image"
-            className="object-cover rounded-md"
+            className="object-cover rounded-md w-[68px] h-[68px]"
           />
-          <span className="text-[18px]">{designer.face_consulting_fee.toLocaleString()}원~</span>
+          <span className="text-[18px]">
+            {designer.available_modes === "대면"
+              ? designer.face_consulting_fee.toLocaleString()
+              : designer.non_face_consulting_fee.toLocaleString()}
+            원~
+          </span>
         </div>
       </article>
     </li>

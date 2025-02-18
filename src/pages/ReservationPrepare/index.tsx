@@ -35,7 +35,7 @@ const timeSlots = [
 
 const ReservationPrepare = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [selectedTime, setSelectedTime] = useState<string>();
+  const [selectedTime, setSelectedTime] = useState<string | undefined>();
   const [reservationList, setReservationList] = useState<DesignerReservationList[]>([]);
   const { state } = useLocation();
   const reservationData: ReservationData = state.reservationData;
@@ -52,13 +52,12 @@ const ReservationPrepare = () => {
     const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
     return `${String(formattedHour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
   }
+  const now = dayjs(); // 현재 시간
+  const isToday = dayjs(date).isSame(now, "day"); // 선택한 날짜가 오늘인지 확인
 
   // 현재 시간 이전의 시간을 disabled 처리하는 함수
   const getDisabledTimes = () => {
     if (!date) return [];
-
-    const now = dayjs(); // 현재 시간
-    const isToday = dayjs(date).isSame(now, "day"); // 선택한 날짜가 오늘인지 확인
 
     // 이미 예약된 시간 목록
     const reservedTimes = reservationList
@@ -130,6 +129,46 @@ const ReservationPrepare = () => {
     fetchReservationList();
   }, [reservationData]);
 
+  const ableButton = () => {
+    return (
+      <button
+        className="w-full py-2 bg-[#D896FF] text-white rounded-lg"
+        onClick={navigatePaymentPage}
+      >
+        다음
+      </button>
+    );
+  };
+
+  const disableButton = () => {
+    return (
+      <button className="w-full py-2 bg-gray-300 text-gray-500 rounded-lg" disabled>
+        다음
+      </button>
+    );
+  };
+
+  const doubleCheckButton = () => {
+    return (
+      <label
+        className={cn(
+          "border rounded-lg p-3 mb-2 flex items-center justify-between cursor-pointer",
+          isChecked ? "border-primary-100" : "border-gray-300"
+        )}
+      >
+        <p>
+          당일 예약은 취소가 불가능합니다. <span className="text-primary-100">(필수)</span>
+        </p>
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={(e) => setIsChecked(e.target.checked)}
+          className="w-4 h-4 accent-primary-100 rounded-xl"
+        />
+      </label>
+    );
+  };
+
   return (
     <div className="pt-8 px-8">
       <ReservationPrepareHeader />
@@ -147,7 +186,7 @@ const ReservationPrepare = () => {
 
       <hr className="my-5" />
 
-      <div className="space-y-4">
+      <div className="space-y-4 mb-9">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">날짜와 시간을 선택해주세요.</h2>
         </div>
@@ -155,7 +194,10 @@ const ReservationPrepare = () => {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={(date) => {
+            setDate(date);
+            setSelectedTime(undefined);
+          }}
           disabled={(date) => date < dayjs().startOf("day").toDate()}
           className="w-full"
         />
@@ -190,35 +232,9 @@ const ReservationPrepare = () => {
         </div>
       </div>
 
-      <label
-        className={cn(
-          "border rounded-lg p-3 mt-[36px] mb-2 flex items-center justify-between cursor-pointer",
-          isChecked ? "border-primary-100" : "border-gray-300"
-        )}
-      >
-        <p>
-          당일 예약은 취소가 불가능합니다. <span className="text-primary-100">(필수)</span>
-        </p>
-        <input
-          type="checkbox"
-          checked={isChecked}
-          onChange={(e) => setIsChecked(e.target.checked)}
-          className="w-4 h-4 accent-primary-100 rounded-xl"
-        />
-      </label>
+      {isToday && doubleCheckButton()}
 
-      {selectedTime && isChecked ? (
-        <button
-          className="w-full py-2 bg-[#D896FF] text-white rounded-lg"
-          onClick={navigatePaymentPage}
-        >
-          다음
-        </button>
-      ) : (
-        <button className="w-full py-2 bg-gray-300 text-gray-500 rounded-lg" disabled>
-          다음
-        </button>
-      )}
+      {selectedTime && date && (!isToday || isChecked) ? ableButton() : disableButton()}
     </div>
   );
 };
