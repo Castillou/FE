@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { PATH } from "@/constants/path";
 import Container from "./Container";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import designerModeFormat from "@/utils/designerModeFormat";
 
 interface DesignerDetailProps {
   id: string | undefined;
@@ -92,7 +93,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
           />
         </div>
 
-        <div className="mb-[85px]">
+        <div className="">
           <h4 className="text-[12px] text-primary-200">주파수 지수</h4>
           <div className="bg-primary-100/20 h-[10px] w-full relative">
             <div
@@ -102,6 +103,8 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
           </div>
         </div>
 
+        <div className="w-full h-[9px] bg-selected-default my-12"></div>
+
         <div className="mb-[22px]">
           <h4 className="font-bold mb-[10px]">전문분야</h4>
           <div>
@@ -110,6 +113,17 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
                 {data?.specialties} 전문
               </span>
             </div>
+          </div>
+        </div>
+
+        <div className="mb-[22px]">
+          <h4 className="font-bold mb-[10px]">컨설팅 방식</h4>
+          <div className="flex gap-2">
+            {designerModeFormat(data?.available_modes as DesignerMode)?.map((mode) => (
+              <div className="bg-[#f4f4f4] rounded-full px-3 py-[2px] whitespace-nowrap" key={mode}>
+                <span className="text-[11px]">{mode}</span>
+              </div>
+            ))}
           </div>
         </div>
 

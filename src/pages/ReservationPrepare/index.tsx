@@ -63,12 +63,13 @@ const ReservationPrepare = () => {
     const reservedTimes = reservationList
       .filter(
         (reservation) =>
-          reservation.status === "예약완료" &&
+          (reservation.status === "예약완료" || reservation.status === "결제대기") &&
           dayjs(reservation.reservation_date_time).format("YYYY-MM-DD") ===
             dayjs(date).format("YYYY-MM-DD")
       )
       .map((reservation) => dayjs(reservation.reservation_date_time).format("HH:mm"));
 
+    console.log(reservationList);
     // 오늘 날짜인 경우 현재 시간 이전의 시간을 disabled 처리
     const disabledTimes = isToday
       ? timeSlots

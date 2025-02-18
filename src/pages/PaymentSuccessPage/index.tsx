@@ -266,8 +266,8 @@ const PaymentSuccessPage = () => {
       </Card>
 
       {/* 하단 버튼 */}
-      <div>
-        <div className="flex gap-[10px]">
+      <div className="min-w-[375px] max-w-[450px] m-auto p-4 bg-white border-t mt-8">
+        <div className="flex gap-3 px-2">
           <Button
             variant="outline"
             className="flex justify-center items-center w-[155px] h-[48px] px-5 py-[5px] bg-white border border-[#D896FF] rounded-[12px] text-[#D896FF] font-semibold text-base leading-[21px] tracking-[-0.04em]"
