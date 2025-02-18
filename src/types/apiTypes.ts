@@ -21,7 +21,7 @@ export interface Reservation {
   google_meet_link?: string | null;
   mode: "대면" | "비대면";
   reservation_date_time: string;
-  status: "예약완료" | "예약취소" | "상담완료";
+  status: "예약완료" | "예약취소" | "결제대기";
 }
 
 export interface User {

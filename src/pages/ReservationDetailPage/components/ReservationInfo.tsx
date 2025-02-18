@@ -56,9 +56,16 @@ const ReservationInfo = ({ reservation, designer }: ReservationInfoProps) => {
       // 모든 예약 관련 쿼리 무효화
       await queryClient.invalidateQueries({
         queryKey: QUERY_KEY.reservationList.all,
+        exact: false,
       });
-
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEY.reservationList.all,
+      });
       await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.reservationList.detail(reservation.id),
+        exact: false,
+      });
+      await queryClient.refetchQueries({
         queryKey: QUERY_KEY.reservationList.detail(reservation.id),
       });
 

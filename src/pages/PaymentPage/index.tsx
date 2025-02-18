@@ -86,8 +86,13 @@ const PaymentPage = () => {
         await queryClient.invalidateQueries({
           queryKey: QUERY_KEY.reservationList.all,
         });
-
+        await queryClient.refetchQueries({
+          queryKey: QUERY_KEY.reservationList.all,
+        });
         await queryClient.invalidateQueries({
+          queryKey: QUERY_KEY.reservationList.list(user.user_id),
+        });
+        await queryClient.refetchQueries({
           queryKey: QUERY_KEY.reservationList.list(user.user_id),
         });
 

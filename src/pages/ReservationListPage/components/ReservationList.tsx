@@ -11,6 +11,9 @@ const ReservationList = ({ list }: ReservationListProps) => {
   // 현재 시간
   const now = dayjs();
 
+  // 2. "결제대기" 상태의 예약만 필터링
+  const waitingReservations = list.filter((reservation) => reservation.status === "결제대기");
+
   // 1. "예약완료" 상태이면서 예약 시간이 지나지 않은 예약만 필터링
   const completedReservations = list.filter(
     (reservation) =>
@@ -28,11 +31,21 @@ const ReservationList = ({ list }: ReservationListProps) => {
 
   return (
     <Tabs defaultValue="completed" className="w-full px-4">
-      <TabsList className="grid w-full grid-cols-3 mb-4">
+      <TabsList className="grid w-full grid-cols-4 mb-4">
+        <TabsTrigger value="waiting">결제대기</TabsTrigger>
         <TabsTrigger value="completed">예약완료</TabsTrigger>
         <TabsTrigger value="canceled">예약취소</TabsTrigger>
         <TabsTrigger value="past">지난 예약</TabsTrigger>
       </TabsList>
+
+      {/* 결제대기 탭 */}
+      <TabsContent value="waiting">
+        <ul className="flex flex-col gap-4">
+          {waitingReservations.map((reservation) => (
+            <ReservationItem key={reservation.id} reservation={reservation} />
+          ))}
+        </ul>
+      </TabsContent>
 
       {/* 예약완료 탭 */}
       <TabsContent value="completed">

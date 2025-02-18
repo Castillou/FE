@@ -1,7 +1,6 @@
 import { getDesignerDetail } from "@/apis/designerDetail";
 import { PATH } from "@/constants/path";
 import QUERY_KEY from "@/constants/queryKey";
-import { cn } from "@/lib/utils";
 import { Reservation } from "@/types/apiTypes";
 import { formatReservationDate } from "@/utils/dayFormat";
 import { useQuery } from "@tanstack/react-query";
@@ -48,6 +47,19 @@ const DesignerItem = ({ reservation }: ReservationItemProps) => {
     );
   }
 
+  const getStatusClassName = (isPastReservation: boolean, status: string) => {
+    if (isPastReservation) {
+      return "px-3 py-1 rounded-full block text-body2 bg-green-500/20";
+    }
+    if (status === "예약완료") {
+      return "px-3 py-1 rounded-full block text-body2 bg-info-500/20";
+    }
+    if (status === "결제대기") {
+      return "px-3 py-1 rounded-full block text-body2 bg-yellow-500/20";
+    }
+    return "px-3 py-1 rounded-full block text-body2 bg-red-500/20";
+  };
+
   // 예약 시간이 지났는지 확인
   const isPastReservation = dayjs(reservation.reservation_date_time).isBefore(dayjs());
 
@@ -61,16 +73,7 @@ const DesignerItem = ({ reservation }: ReservationItemProps) => {
           <span className="bg-white px-3 py-1 rounded-full block text-body2">
             {reservation.mode}
           </span>
-          <span
-            className={cn(
-              "bg-white px-3 py-1 rounded-full block text-body2", // 기본 스타일
-              isPastReservation
-                ? "bg-green-500/20 text-body2" // 지난 예약은 초록색 배경
-                : reservation.status === "예약완료"
-                ? "bg-info-500/20 text-body2"
-                : "bg-red-500/20 text-body2"
-            )}
-          >
+          <span className={getStatusClassName(isPastReservation, reservation.status)}>
             {isPastReservation ? "이용완료" : reservation.status}
             {/* 지난 예약은 "이용완료"로 표시 */}
           </span>
