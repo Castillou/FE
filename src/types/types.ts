@@ -19,8 +19,8 @@ export interface ReservationData extends DesignerDetailResponse {
   selectedMode: DesignerMode | null;
 }
 
-export interface PaymentsData extends DesignerDetailResponse {
+export interface ConsultingReservationData extends DesignerDetailResponse {
   selectedMode: DesignerMode;
   servicePrice: number;
-  selectedDateTime: Date;
+  selectedDate: Date;
 }

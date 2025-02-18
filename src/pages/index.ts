@@ -9,4 +9,3 @@ export { default as MyPage } from "./MyPage";
 export { default as PaymentPreparePage } from "./PaymentPreparePage";
 export { default as PaymentBankTransferPage } from "./PaymentBankTransferPage";
 export { default as ErrorPage } from "./ErrorPage";
-export { default as ReservationPage } from "./ReservationPage";

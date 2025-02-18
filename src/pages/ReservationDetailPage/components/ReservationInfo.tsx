@@ -1,12 +1,10 @@
-import { getDesignerDetail } from "@/apis/designerDetail";
 import { reservationCancel } from "@/apis/reservationCancel";
 import { getGoogleMeetLink } from "@/apis/generateGoogleMeet";
 import { PATH } from "@/constants/path";
-import QUERY_KEY from "@/constants/queryKey";
 import { cn } from "@/lib/utils";
-import { Reservation } from "@/types/apiTypes";
+import { DesignerDetailResponse, Reservation } from "@/types/apiTypes";
 import { formatReservationDate, isWithin30Minutes } from "@/utils/dayFormat";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,
@@ -20,29 +18,17 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import QUERY_KEY from "@/constants/queryKey";
 
 interface ReservationInfoProps {
   reservation: Reservation;
+  designer: DesignerDetailResponse;
 }
 
-const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
+const ReservationInfo = ({ reservation, designer }: ReservationInfoProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [googleMeetLink, setGoogleMeetLink] = useState<string | null>(null);
-
-  // 디자이너 정보를 useQuery로 불러오기
-  const {
-    data: designer,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: QUERY_KEY.designer.detail(reservation.designer_id),
-    queryFn: () => getDesignerDetail(reservation.designer_id),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 60,
-    refetchOnWindowFocus: false,
-  });
 
   // 예약 시간이 30분 이내인지 확인하고 구글 미트 링크를 가져오는 로직
   useEffect(() => {
@@ -62,29 +48,25 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
   // "재예약" 상태인지 확인 (예약 취소 또는 이용 완료)
   const isReReservation = reservation.status === "예약취소" || isPastReservation;
 
-  // 로딩 상태 표시
-  if (isLoading) {
-    return <li className="px-6 py-4 bg-gray-scale-100 rounded-xl">로딩 중...</li>;
-  }
-
-  // 에러 상태 표시
-  if (isError) {
-    return (
-      <li className="px-6 py-4 bg-gray-scale-100 rounded-xl text-red-500">
-        {error.message || "디자이너 정보를 불러오는 데 실패했습니다."}
-      </li>
-    );
-  }
-
   // 예약 취소 처리
   const handleCancelReservation = async () => {
-    await reservationCancel(reservation.id);
+    try {
+      await reservationCancel(reservation.id);
 
-    await queryClient.invalidateQueries({
-      queryKey: ["reservationList"],
-    });
+      // 모든 예약 관련 쿼리 무효화
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.reservationList.all,
+      });
 
-    navigate(PATH.reservationList);
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.reservationList.detail(reservation.id),
+      });
+
+      alert("예약이 취소되었습니다.");
+      navigate(PATH.reservationList);
+    } catch (error) {
+      console.error("예약 취소 중 오류 발생:", error);
+    }
   };
 
   // 재예약 처리
@@ -95,7 +77,7 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
   return (
     <section className="flex flex-col justify-between">
       <article className="flex mb-4 items-center justify-between">
-        <h3 className="text-xl font-bold">이초 디자이너</h3>
+        <h3 className="text-xl font-bold">{designer?.name}</h3>
         <span className="text-body2 font-light text-gray-scale-300">
           {formatReservationDate(reservation.reservation_date_time)}
         </span>
@@ -124,7 +106,7 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
         </span>
       </article>
       <div className="border border-gray-scale-200 rounded text-sm text-gray-scale-400 p-2 mb-3 text-center">
-        {reservation.mode === "대면" && designer?.shop_address}
+        {!isReReservation && reservation.mode === "대면" && designer?.shop_address}
         {!isReReservation &&
           reservation.mode === "비대면" &&
           (isWithin30Minutes(reservation.reservation_date_time)
@@ -157,8 +139,8 @@ const ReservationInfo = ({ reservation }: ReservationInfoProps) => {
                   </div>
                 </div>
               </DialogTitle>
-              <DialogDescription>
-                <div className="text-center text-body1 mb-3">정말로 예약을 취소하시겠습니까?</div>
+              <DialogDescription className="text-center text-body1 mb-3">
+                정말로 예약을 취소하시겠습니까?
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

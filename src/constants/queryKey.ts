@@ -6,6 +6,7 @@ const DESIGNER = {
 };
 
 const RESERVATION = {
+  all: ["reservationList"],
   list: (user_id: string) => ["reservationList", { user_id }],
   detail: (reservation_id: string) => ["reservationDetail", { reservation_id }],
 };

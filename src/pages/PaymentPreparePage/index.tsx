@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { paymentApi } from '../../services/paymentApi';
-import { PATH } from '@/constants/path';
-import { Calendar } from '@/components/ui/calendar';
-import { format } from 'date-fns'; // new import
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { paymentApi } from "../../services/paymentApi";
+import { PATH } from "@/constants/path";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns"; // new import
 
 const PaymentPreparePage = () => {
   const navigate = useNavigate();
@@ -12,35 +12,35 @@ const PaymentPreparePage = () => {
 
   // New state for user input
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  const [reservationTime, setReservationTime] = useState('10:00'); // using time picker (HH:mm)
-  const [servicePrice, setServicePrice] = useState('');
-  const [selectedMode, setSelectedMode] = useState('');
+  const [reservationTime, setReservationTime] = useState("10:00"); // using time picker (HH:mm)
+  const [servicePrice, setServicePrice] = useState("");
+  const [selectedMode, setSelectedMode] = useState("");
 
   const handlePrepare = async () => {
     try {
       setLoading(true);
       const response = await paymentApi.payReady();
       const reservationId = response._id;
-      
+
       // Format selectedDate as "yyyyMMdd" and append time from reservationTime (expected "HHmm")
-      const datePart = selectedDate ? format(selectedDate, "yyyyMMdd") : '';
+      const datePart = selectedDate ? format(selectedDate, "yyyyMMdd") : "";
       // Remove colon from reservationTime to produce "HHmm"
       const timePart = reservationTime.replace(":", "");
       const formattedDate = datePart + timePart;
-      
+
       // Pass the captured values along with reservationId
-      navigate(PATH.payments, { 
-        state: { 
+      navigate(PATH.payments, {
+        state: {
           reservationData: {
             reservationId,
             selectedDate: formattedDate,
             servicePrice,
             selectedMode,
-          }
-        } 
+          },
+        },
       });
     } catch {
-      setError('예약 준비 중 오류가 발생했습니다.');
+      setError("예약 준비 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -60,11 +60,7 @@ const PaymentPreparePage = () => {
         {/* Calendar for selecting date */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-1">예약 날짜</label>
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-          />
+          <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} />
         </div>
         {/* Native time picker input */}
         <div className="mb-4">
@@ -103,7 +99,7 @@ const PaymentPreparePage = () => {
           disabled={loading}
           className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded"
         >
-          {loading ? '준비중...' : '예약 시작하기'}
+          {loading ? "준비중..." : "예약 시작하기"}
         </button>
       </div>
     </div>

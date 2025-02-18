@@ -1,11 +1,13 @@
-const ImageSection = () => {
+import { DesignerDetailResponse } from "@/types/apiTypes";
+
+const ImageSection = ({ designer }: { designer: DesignerDetailResponse }) => {
   return (
     <section>
-      <div className="mb-4 w-full aspect-ratio rounded-xl overflow-hidden">
+      <div className="mb-4 w-full h-80 aspect-ratio rounded-xl overflow-hidden">
         <img
-          src="https://placehold.co/300x300?text=haertz"
+          src={designer.profile_image}
           alt="Reservation Image"
-          className="size-full object-cover"
+          className="size-full object-cover object-top"
         />
       </div>
     </section>

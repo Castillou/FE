@@ -6,17 +6,18 @@ import { paymentApi } from "../../services/paymentApi";
 // import { Card, CardContent } from "@/components/ui/card";
 import { PATH } from "@/constants/path";
 import { formatReservationDate, formatReverseDate } from "@/utils/dayFormat";
-import { PaymentsData } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
+import { ConsultingReservationData } from "@/types/types";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QUERY_KEY from "@/constants/queryKey";
 import { generateShortUuid } from "@/utils/generateUuid";
 
 const PaymentPage = () => {
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<"BANK" | "KAKAO" | null>(null);
   const { state } = useLocation();
-  const PaymentsData: PaymentsData = state;
+  const ReservationData: ConsultingReservationData = state;
   const navigate = useNavigate();
   // const [agreements, setAgreements] = useState({
   //   all: false,
@@ -35,40 +36,85 @@ const PaymentPage = () => {
     refetchOnMount: false,
   });
 
+  // 모바일 환경 체크 함수 추가
+  const isMobile = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  };
+
   const handlePayment = async () => {
     try {
       setLoading(true);
 
       if (!user) {
+        setError("로그인이 필요합니다.");
+        return;
+      }
+
+      if (!selectedMethod) {
+        setError("결제 방법을 선택해주세요.");
         return;
       }
 
       const readyResponse = await paymentApi.ready({
-        reservation_id: PaymentsData.id,
+        reservation_id: ReservationData.id,
         user_id: user.user_id,
         payment_method: selectedMethod === "BANK" ? "BANK" : "KAKAO_PAY",
-        amount: 40000,
+        amount: state.servicePrice,
         status: "pending",
       });
 
       localStorage.setItem("tid", readyResponse.tid);
       localStorage.setItem("order_id", readyResponse.payment_id);
 
-      const shortUuid = generateShortUuid();
+      if (selectedMethod === "BANK") {
+        const shortUuid = generateShortUuid();
 
-      await ReservationCreate({
-        reservation_id: shortUuid,
-        designer_id: PaymentsData.id,
-        user_id: user.user_id,
-        reservation_date_time: formatReverseDate(state.selectedDateTime),
-        consulting_fee: state.servicePrice.toString(),
-        google_meet_link: "",
-        mode: PaymentsData.selectedMode,
-        status: selectedMethod === "BANK" ? "결제대기" : "예약완료",
-      });
+        await ReservationCreate({
+          reservation_id: shortUuid,
+          designer_id: ReservationData.id,
+          user_id: user.user_id,
+          reservation_date_time: formatReverseDate(state.selectedDate),
+          consulting_fee: state.servicePrice.toString(),
+          google_meet_link: "",
+          mode: ReservationData.selectedMode,
+          status: "결제대기",
+        });
 
-      // Navigate to the success page
-      navigate(PATH.payments, { state: { reservationId: PaymentsData.id } });
+        // 모든 예약 관련 쿼리 무효화
+        await queryClient.invalidateQueries({
+          queryKey: QUERY_KEY.reservationList.all,
+        });
+
+        await queryClient.invalidateQueries({
+          queryKey: QUERY_KEY.reservationList.list(user.user_id),
+        });
+
+        navigate(PATH.paymentBankTransfer, { state: ReservationData });
+      } else if (selectedMethod === "KAKAO") {
+        // 카카오페이 결제 시 디바이스에 따른 리다이렉트
+        const redirectUrl = isMobile()
+          ? readyResponse.next_redirect_mobile_url
+          : readyResponse.next_redirect_pc_url;
+
+        window.location.href = redirectUrl;
+        return;
+      }
+
+      // // Navigate to the success page
+      // navigate(PATH.paymentSuccess, {
+      //   state: {
+      //     reservation_id: ReservationData.id,
+      //     designer_id: ReservationData.id,
+      //     user_id: user.user_id,
+      //     reservation_date_time: formatReverseDate(state.selectedDate),
+      //     consulting_fee: state.servicePrice.toString(),
+      //     google_meet_link: "",
+      //     mode: ReservationData.selectedMode,
+      //     status: "예약완료",
+      //   },
+      // });
     } catch (error) {
       console.error("예약 실패:", error);
       setError("예약에 실패했습니다. 다시 시도해주세요.");
@@ -149,15 +195,15 @@ const PaymentPage = () => {
       </header>
       {/* 예약 정보 */}
       <section className="px-6">
-        <h3 className="text-sub-title font-bold mb-3">{PaymentsData.name}</h3>
+        <h3 className="text-sub-title font-bold mb-3">{ReservationData.name}</h3>
         <div className="flex flex-col gap-2">
           <p className="flex">
             <span className="w-24 text-body1 text-[#C3C3C3]">일정</span>
-            <span>{formatReservationDate(state.selectedDateTime)}</span>
+            <span>{formatReservationDate(state.selectedDate)}</span>
           </p>
           <p className="flex">
             <span className="w-24 text-body1 text-[#C3C3C3]">컨설팅 방식</span>
-            <span>{PaymentsData.selectedMode}</span>
+            <span>{ReservationData.selectedMode}</span>
           </p>
           <div className="my-">
             <svg
