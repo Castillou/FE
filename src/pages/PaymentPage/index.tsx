@@ -76,15 +76,15 @@ const PaymentPage = () => {
         return;
       }
 
+      const shortUuid = generateShortUuid();
+
       const readyResponse = await paymentApi.ready({
-        reservation_id: ReservationData.id,
+        reservation_id: shortUuid,
         user_id: user.user_id,
         payment_method: selectedMethod === "BANK" ? "BANK" : "KAKAO_PAY",
         amount: state.servicePrice,
         status: "pending",
       });
-
-      const shortUuid = generateShortUuid();
 
       localStorage.setItem("tid", readyResponse.tid);
       localStorage.setItem("order_id", readyResponse.payment_id);
