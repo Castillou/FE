@@ -48,7 +48,7 @@ const DesignerItem = ({ reservation }: ReservationItemProps) => {
   }
 
   const getStatusClassName = (isPastReservation: boolean, status: string) => {
-    if (isPastReservation) {
+    if (isPastReservation && status === "예약완료") {
       return "px-3 py-1 rounded-full block text-body2 bg-green-500/20";
     }
     if (status === "예약완료") {
@@ -74,8 +74,9 @@ const DesignerItem = ({ reservation }: ReservationItemProps) => {
             {reservation.mode}
           </span>
           <span className={getStatusClassName(isPastReservation, reservation.status)}>
-            {isPastReservation ? "이용완료" : reservation.status}
-            {/* 지난 예약은 "이용완료"로 표시 */}
+            {isPastReservation && reservation.status === "예약완료"
+              ? "이용완료"
+              : reservation.status}
           </span>
         </div>
       </article>

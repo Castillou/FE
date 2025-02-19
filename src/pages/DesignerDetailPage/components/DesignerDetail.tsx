@@ -96,9 +96,9 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
                 <p className="text-[14px] text-[#676767]">{data?.introduction}</p>
               </div>
               <img
-                src={data?.profile_image}
+                src={data?.profile_image || "/images/DEFAULT_PROFILE.jpg"}
                 onError={(e) => {
-                  e.currentTarget.src = "https://placehold.co/68x68?text=haertz";
+                  e.currentTarget.src = "/images/DEFAULT_PROFILE.jpg";
                 }}
                 alt="designer image"
                 className="object-cover rounded-md w-[68px] h-[68px]"

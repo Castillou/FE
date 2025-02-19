@@ -8,6 +8,10 @@ interface ReservationEndpoint {
   cancel: (reservation_Id: string) => string;
   generateGoogleMeet: (reservation_Id: string) => string;
   create: string;
+  update_reservation_status: (
+    reservation_id: string,
+    reservation_status: "이용완료" | "예약취소" | "결제대기"
+  ) => string;
 }
 
 interface DesignerEndpoint {
@@ -35,6 +39,11 @@ export const RESERVATION_ENDPOINT: ReservationEndpoint = Object.freeze({
   generateGoogleMeet: (reservation_Id: string) =>
     `/reservation/generate_google_meet_link?reservation_id=${reservation_Id}`, // 구글밋 생성
   create: "/reservation/create", // 예약 생성
+  update_reservation_status: (
+    reservation_id: string,
+    reservation_status: "이용완료" | "예약취소" | "결제대기"
+  ) =>
+    `/reservation/update_reservation_status?reservation_id =${reservation_id}$reservation_status=${reservation_status}`, // 예약 상태 업데이트
 });
 
 /**

@@ -40,9 +40,9 @@ const DesignerItem = ({ designer }: DesignerItemProps) => {
 
         <div className="flex flex-col items-center justify-between gap-7">
           <img
-            src={designer.profile_image}
+            src={designer.profile_image || "/images/DEFAULT_PROFILE.jpg"}
             onError={(e) => {
-              e.currentTarget.src = "https://placehold.co/68x68?text=haertz";
+              e.currentTarget.src = "/images/DEFAULT_PROFILE.jpg";
             }}
             alt="designer image"
             className="object-cover rounded-md w-[68px] h-[68px]"

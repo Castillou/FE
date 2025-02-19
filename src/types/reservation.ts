@@ -31,3 +31,16 @@ export interface ReservationCreateResponse {
   google_meet_link: string;
   google_calendar_url: string;
 }
+
+export interface ReservationUpdateResponse {
+  id: string;
+  user_id: string;
+  designer_id: string;
+  mode: string;
+  reservation_date_time: string;
+  consulting_fee: number;
+  google_meet_link: string;
+  status: string;
+  create_at: string;
+  update_at: string;
+}
