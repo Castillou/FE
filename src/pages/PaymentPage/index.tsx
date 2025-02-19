@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getUserMe } from "@/apis/user"; // new import
 import { paymentApi } from "../../services/paymentApi";
@@ -6,12 +6,15 @@ import { paymentApi } from "../../services/paymentApi";
 import { PATH } from "@/constants/path";
 import { formatReservationDate, formatReverseDate } from "@/utils/dayFormat";
 import { ConsultingReservationData } from "@/types/types";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QUERY_KEY from "@/constants/queryKey";
 import { generateShortUuid } from "@/utils/generateUuid";
 import { ReservationCreateRequest } from "@/types/reservation";
+import { ReservationCreate } from "@/apis/reservation";
 
 const PaymentPage = () => {
+  const queryClient = useQueryClient();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<"BANK" | "KAKAO" | null>(null);
@@ -27,6 +30,25 @@ const PaymentPage = () => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
+
+  // 예약 목록 조회 쿼리 무효화 및 새로고침
+  const invalidateAndRefetchQueries = useCallback(
+    async (userId: string) => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.reservationList.all,
+      });
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEY.reservationList.all,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.reservationList.list(userId),
+      });
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEY.reservationList.list(userId),
+      });
+    },
+    [queryClient]
+  );
 
   // 모바일 환경 체크 함수 추가
   const isMobile = () => {
@@ -77,6 +99,13 @@ const PaymentPage = () => {
       localStorage.setItem("reservation_id", shortUuid);
 
       if (selectedMethod === "BANK") {
+        await ReservationCreate(newReservationData);
+
+        const reservationCreateResponse = await ReservationCreate(newReservationData);
+
+        // 모든 예약 관련 쿼리 무효화
+        await invalidateAndRefetchQueries(reservationCreateResponse.user_id);
+
         navigate(PATH.paymentBankTransfer, { state: ReservationData });
       } else if (selectedMethod === "KAKAO") {
         // 카카오페이 결제 시 디바이스에 따른 리다이렉트
