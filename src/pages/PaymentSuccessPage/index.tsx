@@ -3,16 +3,16 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { paymentApi } from "../../services/paymentApi";
 import { PATH } from "@/constants/path";
 import { AxiosError } from "axios";
-import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Check } from "lucide-react";
-import { getReservationDetail } from "@/apis/reservationDetail";
 import devApi from "@/config/axiosDevConfig";
 import { RESERVATION_ENDPOINT } from "@/apis/endpoints";
 import { DesignerDetailResponse } from "@/types/apiTypes";
 import { getDesignerDetail } from "@/apis/designerDetail";
-import { formatReservationDate } from "@/utils/dayFormat";
+import { formatReservationDate, formatReverseDate } from "@/utils/dayFormat";
+import { useQueryClient } from "@tanstack/react-query";
+import QUERY_KEY from "@/constants/queryKey";
 
 interface PaymentInfo {
   amount: number;
@@ -33,6 +33,7 @@ interface ReservationPayload {
 }
 
 const PaymentSuccessPage = () => {
+  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -53,7 +54,7 @@ const PaymentSuccessPage = () => {
   });
 
   // 예약 생성 API 호출 함수
-  const handleCreateReservation = useCallback(async () => {
+  const handleCreateReservation = useCallback(async (reservationPayload: ReservationPayload) => {
     try {
       setLoading(true);
       const reservationResponse = await devApi.post(
@@ -72,7 +73,7 @@ const PaymentSuccessPage = () => {
       }
       setLoading(false);
     }
-  }, [reservationPayload]);
+  }, []);
 
   const handlePaymentApproval = async (pg_token: string, tid: string, order_id: string) => {
     try {
@@ -88,6 +89,54 @@ const PaymentSuccessPage = () => {
       );
     }
   };
+
+  const invalidateAndRefetchQueries = useCallback(
+    async (userId: string) => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.reservationList.all,
+      });
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEY.reservationList.all,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.reservationList.list(userId),
+      });
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEY.reservationList.list(userId),
+      });
+    },
+    [queryClient]
+  );
+
+  useEffect(() => {
+    const reservationDataStr = localStorage.getItem("reservationData");
+    if (reservationDataStr) {
+      const reservationData = JSON.parse(reservationDataStr);
+      const newReservationPayload = {
+        reservation_id: reservationData.id,
+        designer_id: reservationData.designer_id,
+        user_id: reservationData.user_id,
+        reservation_date_time: formatReverseDate(reservationData.selectedDate),
+        consulting_fee: reservationData.servicePrice.toString(),
+        google_meet_link: "",
+        mode: reservationData.selectedMode,
+        status: "예약완료",
+      };
+
+      setReservationPayload(newReservationPayload);
+      handleCreateReservation(newReservationPayload);
+
+      invalidateAndRefetchQueries(reservationData.user_id);
+
+      // 디자이너 정보 가져오기
+      getDesignerDetail(reservationData.designer_id)
+        .then((designerDetail) => setDesignerInfo(designerDetail))
+        .catch(console.error);
+
+      // 사용 후 데이터 삭제
+      localStorage.removeItem("reservationData");
+    }
+  }, [handleCreateReservation, invalidateAndRefetchQueries]);
 
   useEffect(() => {
     const processPaymentAndReservation = async () => {
@@ -107,28 +156,6 @@ const PaymentSuccessPage = () => {
         // 결제 승인 처리
         const paymentResponse = await handlePaymentApproval(pg_token, tid, order_id);
         setPaymentInfo(paymentResponse);
-
-        // 예약 상세 정보 조회 및 예약 생성
-        if (paymentResponse.reservation_id) {
-          const reservationDetail = await getReservationDetail(paymentResponse.reservation_id);
-
-          if (reservationDetail) {
-            setReservationPayload({
-              reservation_id: reservationDetail.id,
-              designer_id: reservationDetail.designer_id,
-              user_id: reservationDetail.user_id,
-              reservation_date_time: reservationDetail.reservation_date_time,
-              consulting_fee: reservationDetail.consulting_fee.toString(),
-              google_meet_link: reservationDetail.google_meet_link,
-              mode: reservationDetail.mode,
-              status: reservationDetail.status,
-            });
-            await handleCreateReservation();
-
-            const designerDetail = await getDesignerDetail(reservationDetail.designer_id);
-            setDesignerInfo(designerDetail);
-          }
-        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "처리 중 오류가 발생했습니다.");
       } finally {
@@ -138,7 +165,7 @@ const PaymentSuccessPage = () => {
     };
 
     processPaymentAndReservation();
-  }, [handleCreateReservation, searchParams]);
+  }, [searchParams]);
 
   if (loading) {
     return <div className="text-center p-8">처리 중...</div>;
@@ -266,21 +293,20 @@ const PaymentSuccessPage = () => {
       </Card>
 
       {/* 하단 버튼 */}
-      <div className="min-w-[375px] max-w-[450px] m-auto p-4 bg-white border-t mt-8">
-        <div className="flex gap-3 px-2">
-          <Button
-            variant="outline"
-            className="flex justify-center items-center w-[155px] h-[48px] px-5 py-[5px] bg-white border border-[#D896FF] rounded-[12px] text-[#D896FF] font-semibold text-base leading-[21px] tracking-[-0.04em]"
+      <div className="flex justify-center items-center px-6">
+        <div className="flex gap-4">
+          <button
+            className="px-8 py-3 bg-white border border-[#D896FF] rounded-lg text-[#D896FF] font-semibold"
             onClick={() => navigate(PATH.reservationList)}
           >
             예약확인
-          </Button>
-          <Button
-            className="flex justify-center items-center w-[155px] h-[48px] px-5 py-[5px] bg-[#D896FF] rounded-[12px] text-white font-semibold text-base leading-[21px] tracking-[-0.04em] shadow-[0px_0px_4px_rgba(0,0,0,0.25)]"
+          </button>
+          <button
+            className="px-8 py-3 bg-[#D896FF] rounded-lg text-white font-semibold shadow-[0px_0px_4px_rgba(0,0,0,0.25)]"
             onClick={() => navigate(PATH.designerList)}
           >
             홈으로
-          </Button>
+          </button>
         </div>
       </div>
     </div>

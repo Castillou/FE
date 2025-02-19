@@ -67,6 +67,14 @@ const PaymentPage = () => {
 
       localStorage.setItem("tid", readyResponse.tid);
       localStorage.setItem("order_id", readyResponse.payment_id);
+      localStorage.setItem(
+        "reservationData",
+        JSON.stringify({
+          ...ReservationData,
+          selectedDate: state.selectedDate,
+          servicePrice: state.servicePrice,
+        })
+      );
 
       if (selectedMethod === "BANK") {
         const shortUuid = generateShortUuid();
