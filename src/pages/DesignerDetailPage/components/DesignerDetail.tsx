@@ -103,7 +103,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
           </div>
         </div>
 
-        <div className="w-full h-[9px] bg-selected-default my-12"></div>
+        <div className="w-full h-[5px] bg-selected-default my-12"></div>
 
         <div className="mb-[22px]">
           <h4 className="font-bold mb-[10px]">전문분야</h4>
@@ -176,11 +176,11 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="p-0 overflow-hidden min-w-[350px] max-w-[450px] m-auto">
+          <DialogContent className="p-0 overflow-hidden min-w-[350px] max-w-[450px] m-auto w-full h-full">
             {selectedVideo && (
               <iframe
                 width="100%"
-                height="600px"
+                height="100%"
                 src={selectedVideo}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen

@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PATH } from "@/constants/path";
+import { formatReservationDate } from "@/utils/dayFormat";
 
 const PaymentBankTransferPage = () => {
   const navigate = useNavigate();
@@ -32,7 +33,9 @@ const PaymentBankTransferPage = () => {
         <div className="pb-7 border-b border-gray-200">
           <div className="flex justify-between mb-[18px]">
             <p className="text-[14px] text-[#C3C3C3] w-[30%] text-left">일정</p>
-            <p className="text-[14px] text-[#000] w-[70%] text-left">{state.selectedDate}</p>
+            <p className="text-[14px] text-[#000] w-[70%] text-left">
+              {formatReservationDate(state.selectedDate)}
+            </p>
           </div>
 
           <div className="flex justify-between mb-[18px]">
