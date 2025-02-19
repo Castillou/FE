@@ -17,7 +17,6 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import designerModeFormat from "@/utils/designerModeFormat";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
-
 interface DesignerDetailProps {
   id: string | undefined;
 }
@@ -177,8 +176,8 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
                     onClick={() => handleVideoClick(`${video.src}&autoplay=1`)}
                   >
                     <iframe
-                      width="82"
-                      height="147"
+                      width="150"
+                      height="270"
                       src={video.src}
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
@@ -191,15 +190,15 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
             </div>
 
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogContent className="p-0 overflow-hidden min-w-[350px] max-w-[450px] m-auto ">
+              <DialogContent className="px-10 py-14 overflow-hidden m-auto max-w-[350px] bg-[none] border-none">
                 {selectedVideo && (
                   <iframe
-                    width="100%"
-                    height="100%"
+                    width="255px"
+                    height="450px"
                     src={selectedVideo}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
-                    className="rounded-md"
+                    className="rounded-md m-auto"
                   ></iframe>
                 )}
               </DialogContent>
