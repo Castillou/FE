@@ -34,8 +34,8 @@ const ReservationInfo = ({ reservation, designer }: ReservationInfoProps) => {
   useEffect(() => {
     const fetchGoogleMeetLink = async () => {
       if (isWithin30Minutes(reservation.reservation_date_time)) {
-        const link = await getGoogleMeetLink(reservation.id);
-        setGoogleMeetLink(link);
+        const response = await getGoogleMeetLink(reservation.id);
+        setGoogleMeetLink(response.google_meet_link);
       }
     };
 
