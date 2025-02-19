@@ -3,8 +3,6 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { paymentApi } from "../../services/paymentApi";
 import { PATH } from "@/constants/path";
 import { AxiosError } from "axios";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Check } from "lucide-react";
 import { DesignerDetailResponse } from "@/types/apiTypes";
 import { getDesignerDetail } from "@/apis/designerDetail";
@@ -15,6 +13,7 @@ import { ReservationCreate } from "@/apis/reservation";
 import { useQueryClient } from "@tanstack/react-query";
 import QUERY_KEY from "@/constants/queryKey";
 import { ReservationCreateRequest } from "@/types/reservation";
+import { Button } from "@/components/ui/button";
 interface ReservationPayload {
   reservation_id: string;
   designer_id: string;
@@ -177,137 +176,93 @@ const PaymentSuccessPage = () => {
     return <div className="text-center p-8 text-red-600">에러: {error}</div>;
   }
 
+  const copyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(designerInfo?.shop_address || "");
+      alert("주소가 복사되었습니다.");
+    } catch {
+      alert("주소 복사에 실패했습니다.");
+    }
+  };
+
   return (
     <div className="min-h-dvh">
       {/* 상단 완료 메시지 */}
-      <div className="flex flex-col items-center justify-center py-8 space-y-2">
-        <Check className="w-10 h-10 mb-2 text-[#D896FF] stroke-2" />
-        <h1 className="text-lg font-medium">예약이 완료되었습니다.</h1>
+      <div className="flex flex-col items-center justify-center mt-12 pb-[38px]">
+        <Check className="w-10 h-10 mb-4 text-[#D896FF] stroke-2" />
+        <h1 className="text-xl mb-[7px] font-bold">예약이 완료되었습니다.</h1>
       </div>
 
-      {/* 예약 정보 (paymentApi.approve 응답 기준) */}
-      {/* <Card className="border-0 shadow-none px-6">
-        <CardContent className="p-4">
-          <div className="space-y-4">
-            <div className="flex">
-              <span className="text-[14px] text-gray-400 w-24">예약 번호</span>
-              <span className="text-gray-700">{paymentInfo?.reservation_id}</span>
-            </div>
-            <div className="flex">
-              <span className="text-[14px] text-gray-400 w-24">예약자</span>
-              <span className="text-gray-700">{paymentInfo?.user_id || "사용자"}</span>
-            </div>
+      <div className="px-6">
+        <div className="flex items-center gap-4 mb-3 pt-6 border-t border-gray-200">
+          <p className="text-[20px] font-bold">{designerInfo?.name || "디자이너 정보 없음"}</p>
+          <div className="bg-secondary-100 rounded-full px-3 py-[2px] whitespace-nowrap">
+            <span className="text-[12px] text-primary-300">{reservationPayload.mode}</span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Separator className="my-4" /> */}
-
-      {/* 결제 정보 */}
-      {/* <Card className="border-0 shadow-none px-6">
-        <CardHeader className="p-4 pb-2">
-          <CardTitle className="text-lg font-medium">결제 정보</CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 space-y-4">
-          <div className="flex">
-            <span className="text-[14px] text-gray-400 w-24">결제 금액</span>
-            <span className="text-gray-700">{paymentInfo?.amount?.toLocaleString()}원</span>
-          </div>
-          <div className="flex">
-            <span className="text-[14px] text-gray-400 w-24">결제 시간</span>
-            <span className="text-gray-700">
-              {paymentInfo && new Date(paymentInfo.approved_at).toLocaleString()}
-            </span>
-          </div>
-        </CardContent>
-      </Card> */}
-
-      <Separator className="my-4" />
-
-      {/* 예약 상세 정보 */}
-      <Card className="border-0 shadow-none px-6">
-        <CardHeader className="p-4 pb-2">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold">{designerInfo?.name || "디자이너 정보 없음"}</h2>
-            <span className="px-3 py-1 text-xs text-[#B434FF] bg-[rgba(216,150,255,0.25)] rounded-full">
-              {reservationPayload.mode}
-            </span>
-          </div>
-        </CardHeader>
-        <CardContent className="p-4 space-y-4">
-          <div className="flex">
-            <span className="inline-block w-20 text-[14px] text-gray-400">일정</span>
-            <span className="text-[14px] text-gray-700">
+        <div className="pb-7 border-b border-gray-200">
+          <div className="flex justify-between mb-[18px]">
+            <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">일정</p>
+            <p className="text-[14px] text-[#000] w-[75%] text-left">
               {formatReservationDate(reservationPayload.reservation_date_time)}
-            </span>
+            </p>
           </div>
 
           {reservationPayload.mode === "비대면" ? (
-            <div className="flex flex-row items-center gap-4 w-[262px] h-8">
-              <span className="inline-block w-20 text-[14px] text-[#C3C3C3] leading-[19px] tracking-[-0.04em]">
-                컨설팅 링크
-              </span>
-              <button className="flex justify-center items-center px-5 py-[5px] w-[182px] h-8 bg-[#C3C3C3] rounded-[15px]">
-                <span className="text-[14px] font-medium text-white text-center leading-[19px] tracking-[-0.04em]">
+            <div className="flex justify-between items-center">
+              <span className="w-[25%] text-[14px] text-[#C3C3C3]">컨설팅 링크</span>
+              <div className="w-[75%]">
+                <button className="w-2/3 flex justify-center items-center px-5 py-2 text-white bg-[#C3C3C3] rounded-full">
                   예약 30분 전 활성화됩니다
-                </span>
-              </button>
+                </button>
+              </div>
             </div>
           ) : (
-            <div className="flex">
-              <span className="inline-block w-20 text-[14px] text-gray-400">매장 정보</span>
-              <span className="text-[14px] text-gray-700">
+            <div className="flex justify-between mb-[18px]">
+              <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">매장 정보</p>
+              <p className="text-[14px] text-[#000] w-[75%] text-left">
                 {designerInfo?.shop_address || "매장 정보 없음"}
-              </span>
-              <button
-                className="text-[14px] text-[#0C63D0]"
-                onClick={() => {
-                  if (designerInfo?.shop_address) {
-                    navigator.clipboard.writeText(designerInfo.shop_address);
-                  }
-                }}
-              >
-                복사
-              </button>
+                <span
+                  className="ml-3 text-[#0C63D0] cursor-pointer hover:underline"
+                  onClick={copyAddress}
+                >
+                  복사
+                </span>
+              </p>
             </div>
           )}
 
-          <div className="flex">
-            <span className="inline-block w-20 text-[14px] text-gray-400">결제수단</span>
-            <span className="text-[14px] text-gray-700">카카오페이</span>
+          <div className="flex justify-between mb-[18px] rounded-xl">
+            <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">결제수단</p>
+            <p className="text-[14px] text-[#000] w-[75%] text-left">카카오페이</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Separator className="my-4" />
-
-      {/* 가격 정보 */}
-      <Card className="border-0 shadow-none px-6">
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-[16px] font-semibold text-black">가격</span>
-            <span className="text-[16px] font-semibold text-[#D896FF]">
-              {paymentInfo?.amount?.toLocaleString()}원
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+        <div className="flex justify-between items-center mt-2">
+          <p className="text-sub-title font-bold text-[#000]">가격</p>
+          <p className="text-sub-title font-bold text-primary-100">
+            {Intl.NumberFormat("ko-KR").format(Number(paymentInfo?.amount))}원
+          </p>
+        </div>
+      </div>
 
       {/* 하단 버튼 */}
-      <div className="flex justify-center items-center px-6">
-        <div className="flex gap-4">
-          <button
-            className="px-8 py-3 bg-white border border-[#D896FF] rounded-lg text-[#D896FF] font-semibold"
+      <div className="min-w-[375px] max-w-[450px] m-auto p-4 px-6 bg-white mt-8">
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            className="w-1/2 h-12 text-primary-100 border-primary-100 rounded-[12px]"
             onClick={() => navigate(PATH.reservationList)}
           >
-            예약확인
-          </button>
-          <button
-            className="px-8 py-3 bg-[#D896FF] rounded-lg text-white font-semibold shadow-[0px_0px_4px_rgba(0,0,0,0.25)]"
+            예약목록
+          </Button>
+          <Button
+            className="w-1/2 h-12 hover:opacity-80 bg-primary-100 text-white rounded-[12px]"
             onClick={() => navigate(PATH.designerList)}
           >
             홈으로
-          </button>
+          </Button>
         </div>
       </div>
     </div>
