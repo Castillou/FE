@@ -10,7 +10,7 @@ import devApi from "@/config/axiosDevConfig";
 import { RESERVATION_ENDPOINT } from "@/apis/endpoints";
 import { DesignerDetailResponse } from "@/types/apiTypes";
 import { getDesignerDetail } from "@/apis/designerDetail";
-import { formatReservationDate, formatReverseDate } from "@/utils/dayFormat";
+import { formatReservationDate } from "@/utils/dayFormat";
 import { useQueryClient } from "@tanstack/react-query";
 import QUERY_KEY from "@/constants/queryKey";
 
@@ -113,13 +113,7 @@ const PaymentSuccessPage = () => {
     if (reservationDataStr) {
       const reservationData = JSON.parse(reservationDataStr);
       const newReservationPayload = {
-        reservation_id: reservationData.id,
-        designer_id: reservationData.designer_id,
-        user_id: reservationData.user_id,
-        reservation_date_time: formatReverseDate(reservationData.selectedDate),
-        consulting_fee: reservationData.servicePrice.toString(),
-        google_meet_link: "",
-        mode: reservationData.selectedMode,
+        ...reservationData,
         status: "예약완료",
       };
 

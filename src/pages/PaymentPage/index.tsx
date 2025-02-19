@@ -67,28 +67,24 @@ const PaymentPage = () => {
 
       localStorage.setItem("tid", readyResponse.tid);
       localStorage.setItem("order_id", readyResponse.payment_id);
-      localStorage.setItem(
-        "reservationData",
-        JSON.stringify({
-          ...ReservationData,
-          selectedDate: state.selectedDate,
-          servicePrice: state.servicePrice,
-        })
-      );
+
+      const shortUuid = generateShortUuid();
+
+      const newReservationData = {
+        reservation_id: shortUuid,
+        designer_id: ReservationData.id,
+        user_id: user.user_id,
+        reservation_date_time: formatReverseDate(state.selectedDate),
+        consulting_fee: state.servicePrice.toString(),
+        google_meet_link: "",
+        mode: ReservationData.selectedMode,
+        status: "결제대기",
+      };
+
+      localStorage.setItem("reservationData", JSON.stringify(newReservationData));
 
       if (selectedMethod === "BANK") {
-        const shortUuid = generateShortUuid();
-
-        await ReservationCreate({
-          reservation_id: shortUuid,
-          designer_id: ReservationData.id,
-          user_id: user.user_id,
-          reservation_date_time: formatReverseDate(state.selectedDate),
-          consulting_fee: state.servicePrice.toString(),
-          google_meet_link: "",
-          mode: ReservationData.selectedMode,
-          status: "결제대기",
-        });
+        await ReservationCreate(newReservationData);
 
         // 모든 예약 관련 쿼리 무효화
         await queryClient.invalidateQueries({
