@@ -9,31 +9,26 @@ import {
   RESERVATION_ROUTES,
   MYPAGE_ROUTES,
 } from "./route";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootLayout />,
+    element: (
+      <ScrollToTop>
+        <RootLayout />
+      </ScrollToTop>
+    ),
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/",
+        path: "",
         children: LOGIN_ROUTES,
       },
       {
-        path: "/",
+        path: "",
         element: <HomeLayout />,
-        children: [
-          {
-            path: "/",
-            children: [
-              ...DESIGNER_ROUTES,
-              ...PAYMENTS_ROUTES,
-              ...RESERVATION_ROUTES,
-              ...MYPAGE_ROUTES,
-            ],
-          },
-        ],
+        children: [...DESIGNER_ROUTES, ...PAYMENTS_ROUTES, ...RESERVATION_ROUTES, ...MYPAGE_ROUTES],
       },
     ],
   },

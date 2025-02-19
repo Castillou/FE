@@ -22,9 +22,12 @@ export interface ReservationCreateRequest {
 }
 
 export interface ReservationCreateResponse {
+  reservation_id: string;
   user_id: string;
   designer_id: string;
   reservation_date_time: string;
   mode: string;
   status: string;
+  google_meet_link: string;
+  google_calendar_url: string;
 }
