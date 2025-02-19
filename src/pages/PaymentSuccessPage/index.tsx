@@ -189,7 +189,7 @@ const PaymentSuccessPage = () => {
     <div className="min-h-dvh">
       {/* 상단 완료 메시지 */}
       <div className="flex flex-col items-center justify-center mt-12 pb-[38px]">
-        <Check className="w-10 h-10 mb-4 text-[#D896FF] stroke-2" />
+        <Check className="w-10 h-10 mb-8 text-[#D896FF] stroke-2" />
         <h1 className="text-xl mb-[7px] font-bold">예약이 완료되었습니다.</h1>
       </div>
 
@@ -201,7 +201,7 @@ const PaymentSuccessPage = () => {
           </div>
         </div>
 
-        <div className="pb-7 border-b border-gray-200">
+        <div className="pb-6 border-b border-gray-200">
           <div className="flex justify-between mb-[18px]">
             <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">일정</p>
             <p className="text-[14px] text-[#000] w-[75%] text-left">
@@ -210,10 +210,10 @@ const PaymentSuccessPage = () => {
           </div>
 
           {reservationPayload.mode === "비대면" ? (
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-[18px]">
               <span className="w-[25%] text-[14px] text-[#C3C3C3]">컨설팅 링크</span>
               <div className="w-[75%]">
-                <button className="w-2/3 flex justify-center items-center px-5 py-2 text-white bg-[#C3C3C3] rounded-full">
+                <button className="flex justify-center items-center px-5 py-2 text-white bg-[#C3C3C3] rounded-full">
                   예약 30분 전 활성화됩니다
                 </button>
               </div>
@@ -233,7 +233,7 @@ const PaymentSuccessPage = () => {
             </div>
           )}
 
-          <div className="flex justify-between mb-[18px] rounded-xl">
+          <div className="flex justify-between rounded-xl">
             <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">결제수단</p>
             <p className="text-[14px] text-[#000] w-[75%] text-left">카카오페이</p>
           </div>
@@ -248,7 +248,7 @@ const PaymentSuccessPage = () => {
       </div>
 
       {/* 하단 버튼 */}
-      <div className="min-w-[375px] max-w-[450px] m-auto p-4 px-6 bg-white mt-8">
+      <div className="min-w-[375px] max-w-[450px] m-auto p-4 px-6 bg-white mt-6">
         <div className="flex gap-3">
           <Button
             variant="outline"
