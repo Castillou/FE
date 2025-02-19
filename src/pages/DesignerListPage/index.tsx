@@ -10,8 +10,11 @@ import { DesignerFilterMode, DesignerLocation, FilterOptions } from "@/types/typ
 import FilteredOptionBox from "./components/DesignerFilter/FilteredOptionBox";
 import FilterDrawer from "./components/DesignerFilter/FilterDrawer";
 import { handleLocation, handleMode } from "@/utils/filterOption";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 const DesignerListPage = () => {
+  const { toast } = useToast();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
@@ -51,6 +54,7 @@ const DesignerListPage = () => {
     data: designerData,
     isPending: designerPending,
     isError: designerError,
+    error,
   } = useQuery({
     queryKey: QUERY_KEY.designer.list({ ...filterOptions }),
     queryFn: () => getDesignerList(filterOptions),
@@ -58,12 +62,22 @@ const DesignerListPage = () => {
     gcTime: 1000 * 60 * 60,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    retry: 1,
   });
+
+  useEffect(() => {
+    if (designerError) {
+      toast({
+        variant: "destructive",
+        title: "오류가 발생했습니다.",
+        description: "디자이너 목록을 불러오는데 실패했습니다.",
+        duration: 3000,
+      });
+    }
+  }, [designerError, error, toast]);
 
   return (
     <>
-      {designerError && <div>Error</div>}
-      {designerPending && <div>Loading...</div>}
       {designerData && (
         <div>
           {designerPending ? (
@@ -122,6 +136,7 @@ const DesignerListPage = () => {
           )}
         </div>
       )}
+      <Toaster />
     </>
   );
 };

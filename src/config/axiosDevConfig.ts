@@ -5,6 +5,7 @@ import axios from "axios";
 const devApi = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
+  timeout: 1000,
   headers: {
     "Content-Type": "application/json",
   },

@@ -13,7 +13,7 @@ export default {
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          "100": "rgba(216, 150, 255, 0.63)",
+          "100": "rgba(216, 150, 255, 0.1)",
           "500": "#F85900",
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

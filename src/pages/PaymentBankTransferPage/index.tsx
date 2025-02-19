@@ -23,7 +23,7 @@ const PaymentBankTransferPage = () => {
       </header>
 
       <div className="px-6 mt-12">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-6">
           <p className="text-[20px] font-bold">{state.name}</p>
           <div className="bg-secondary-100 rounded-full px-3 py-[2px] whitespace-nowrap">
             <span className="text-[12px] text-primary-300">{state.selectedMode}</span>
@@ -41,7 +41,7 @@ const PaymentBankTransferPage = () => {
           <div className="flex justify-between mb-[18px]">
             <p className="text-[14px] text-[#C3C3C3] w-[30%] text-left">매장 정보</p>
             <p className="text-[14px] text-[#000] w-[70%] text-left">
-              {state.address}{" "}
+              {state.address}
               <span className="text-[#0C63D0] cursor-pointer hover:underline" onClick={copyAddress}>
                 복사
               </span>
@@ -69,15 +69,10 @@ const PaymentBankTransferPage = () => {
           <p className=" text-[#000]">가격</p>
           <p className=" text-primary-100">{state.servicePrice}</p>
         </div>
-
-        {/* 예약 완료 메시지 */}
-        <div className="py-8 text-center">
-          <p className="text-sm text-gray-600">아래 계좌로 입금해 주세요</p>
-        </div>
       </div>
 
       {/* 하단 버튼 */}
-      <div className="min-w-[375px] max-w-[450px] m-auto p-4 px-6 bg-white border-t mt-8">
+      <div className="min-w-[375px] max-w-[450px] m-auto   p-4 px-6 bg-white border-t mt-8">
         <div className="flex gap-3">
           <Button
             variant="outline"

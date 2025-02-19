@@ -17,7 +17,7 @@ export const getDesignerList = async (filterOptions: FilterOptions) => {
 
     return response.data.designer_list;
   } catch (error) {
-    console.error("디자이너 상세 정보 불러오기 실패:", error);
+    console.error(error);
     throw error;
   }
 };
