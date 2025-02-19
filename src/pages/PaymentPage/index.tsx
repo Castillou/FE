@@ -84,10 +84,11 @@ const PaymentPage = () => {
         status: "pending",
       });
 
+      const shortUuid = generateShortUuid();
+
       localStorage.setItem("tid", readyResponse.tid);
       localStorage.setItem("order_id", readyResponse.payment_id);
-
-      const shortUuid = generateShortUuid();
+      localStorage.setItem("reservation_id", shortUuid);
 
       const newReservationData: ReservationCreateRequest = {
         reservation_id: shortUuid,

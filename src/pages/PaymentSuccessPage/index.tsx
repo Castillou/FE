@@ -109,6 +109,7 @@ const PaymentSuccessPage = () => {
         const pg_token = searchParams.get("pg_token");
         const tid = localStorage.getItem("tid");
         const order_id = localStorage.getItem("order_id");
+        const reservation_id = localStorage.getItem("reservation_id");
 
         if (!pg_token || !tid || !order_id) {
           throw new Error("결제 정보가 없습니다.");
@@ -118,7 +119,12 @@ const PaymentSuccessPage = () => {
         const paymentResponse = await handlePaymentApproval(pg_token, tid, order_id);
         setPaymentInfo(paymentResponse);
 
-        const reservationResponse = await getReservationDetail(paymentResponse.reservation_id);
+        if (!reservation_id) {
+          throw new Error("예약 정보가 없습니다.");
+        }
+
+        const reservationResponse = await getReservationDetail(reservation_id);
+        localStorage.removeItem("reservation_id");
 
         if (reservationResponse) {
           setReservationPayload({
