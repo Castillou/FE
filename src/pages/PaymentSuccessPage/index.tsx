@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { paymentApi } from "../../services/paymentApi";
 import { PATH } from "@/constants/path";
 import { AxiosError } from "axios";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Check } from "lucide-react";
 import { DesignerDetailResponse } from "@/types/apiTypes";
@@ -186,7 +186,7 @@ const PaymentSuccessPage = () => {
       </div>
 
       {/* 예약 정보 (paymentApi.approve 응답 기준) */}
-      <Card className="border-0 shadow-none px-6">
+      {/* <Card className="border-0 shadow-none px-6">
         <CardContent className="p-4">
           <div className="space-y-4">
             <div className="flex">
@@ -197,15 +197,14 @@ const PaymentSuccessPage = () => {
               <span className="text-[14px] text-gray-400 w-24">예약자</span>
               <span className="text-gray-700">{paymentInfo?.user_id || "사용자"}</span>
             </div>
-            {/* 추가 정보는 필요에 따라 렌더링 */}
           </div>
         </CardContent>
       </Card>
 
-      <Separator className="my-4" />
+      <Separator className="my-4" /> */}
 
       {/* 결제 정보 */}
-      <Card className="border-0 shadow-none px-6">
+      {/* <Card className="border-0 shadow-none px-6">
         <CardHeader className="p-4 pb-2">
           <CardTitle className="text-lg font-medium">결제 정보</CardTitle>
         </CardHeader>
@@ -221,7 +220,7 @@ const PaymentSuccessPage = () => {
             </span>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       <Separator className="my-4" />
 
@@ -237,7 +236,7 @@ const PaymentSuccessPage = () => {
         </CardHeader>
         <CardContent className="p-4 space-y-4">
           <div className="flex">
-            <span className="text-[14px] text-gray-400 w-24">일정</span>
+            <span className="inline-block w-20 text-[14px] text-gray-400">일정</span>
             <span className="text-[14px] text-gray-700">
               {formatReservationDate(reservationPayload.reservation_date_time)}
             </span>
@@ -245,7 +244,7 @@ const PaymentSuccessPage = () => {
 
           {reservationPayload.mode === "비대면" ? (
             <div className="flex flex-row items-center gap-4 w-[262px] h-8">
-              <span className="text-[14px] text-[#C3C3C3] leading-[19px] tracking-[-0.04em]">
+              <span className="inline-block w-20 text-[14px] text-[#C3C3C3] leading-[19px] tracking-[-0.04em]">
                 컨설팅 링크
               </span>
               <button className="flex justify-center items-center px-5 py-[5px] w-[182px] h-8 bg-[#C3C3C3] rounded-[15px]">
@@ -256,7 +255,7 @@ const PaymentSuccessPage = () => {
             </div>
           ) : (
             <div className="flex">
-              <span className="text-[14px] text-gray-400 w-24">매장 정보</span>
+              <span className="inline-block w-20 text-[14px] text-gray-400">매장 정보</span>
               <span className="text-[14px] text-gray-700">
                 {designerInfo?.shop_address || "매장 정보 없음"}
               </span>
@@ -274,7 +273,7 @@ const PaymentSuccessPage = () => {
           )}
 
           <div className="flex">
-            <span className="text-[14px] text-gray-400 w-24">결제수단</span>
+            <span className="inline-block w-20 text-[14px] text-gray-400">결제수단</span>
             <span className="text-[14px] text-gray-700">카카오페이</span>
           </div>
         </CardContent>

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getUserMe } from "@/apis/user"; // new import
 import { paymentApi } from "../../services/paymentApi";
@@ -57,6 +57,27 @@ const PaymentPage = () => {
     );
   };
 
+  // 페이지 진입 시 예약 가능 여부 확인
+  useEffect(() => {
+    const checkReservationAvailability = async () => {
+      try {
+        await paymentApi.payReady(ReservationData.id, formatReverseDate(state.selectedDate));
+      } catch (error) {
+        console.error("예약 준비 중 오류가 발생했습니다.", error);
+        alert("해당 일시에 예약이 이미 존재합니다.");
+
+        setTimeout(() => {
+          navigate(PATH.reservationPrepare(ReservationData.id), {
+            state: { reservationData: ReservationData },
+          });
+        }, 2000);
+      }
+    };
+
+    checkReservationAvailability();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 컴포넌트 마운트 시 1회만 실행
+
   const handlePayment = async () => {
     try {
       setLoading(true);
@@ -99,8 +120,6 @@ const PaymentPage = () => {
       localStorage.setItem("reservation_id", shortUuid);
 
       if (selectedMethod === "BANK") {
-        await ReservationCreate(newReservationData);
-
         const reservationCreateResponse = await ReservationCreate(newReservationData);
 
         // 모든 예약 관련 쿼리 무효화
@@ -131,7 +150,7 @@ const PaymentPage = () => {
   return (
     <div className="min-h-dvh pt-5">
       <header className="flex items-center justify-between mb-5 px-6">
-        <div onClick={() => navigate(-1)}>
+        <div onClick={() => navigate(-1)} className="cursor-pointer">
           <svg
             width="10"
             height="18"
@@ -177,12 +196,13 @@ const PaymentPage = () => {
             <span className="w-24 text-body1 text-[#C3C3C3]">컨설팅 방식</span>
             <span>{ReservationData.selectedMode}</span>
           </p>
-          <div className="my-">
+          <div className="my-2 w-full">
             <svg
-              width="357"
+              width="100%"
               height="5"
               viewBox="0 0 357 5"
               fill="none"
+              preserveAspectRatio="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path

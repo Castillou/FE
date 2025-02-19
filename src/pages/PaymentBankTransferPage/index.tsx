@@ -8,13 +8,18 @@ const PaymentBankTransferPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  const copyAddress = () => {
-    navigator.clipboard.writeText(state.address);
+  const copyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(state.shop_address);
+      alert("주소가 복사되었습니다.");
+    } catch {
+      alert("주소 복사에 실패했습니다.");
+    }
   };
 
   return (
     <div className="min-h-dvh">
-      <header className="flex flex-col items-center gap-2 mt-12 pb-[38px] border-b border-gray-200">
+      <header className="flex flex-col items-center gap-2 mt-12 pb-[38px]">
         <img src="/images/timer.svg" alt="timer" className="mb-4" />
         <h2 className="text-xl mb-[7px] font-bold">예약 대기중입니다.</h2>
         <span className="text-sm text-[#C3C3C3]">
@@ -22,8 +27,8 @@ const PaymentBankTransferPage = () => {
         </span>
       </header>
 
-      <div className="px-6 mt-12">
-        <div className="flex items-center gap-2 mb-6">
+      <div className="px-6">
+        <div className="flex items-center gap-4 mb-3 pt-6 border-t border-gray-200">
           <p className="text-[20px] font-bold">{state.name}</p>
           <div className="bg-secondary-100 rounded-full px-3 py-[2px] whitespace-nowrap">
             <span className="text-[12px] text-primary-300">{state.selectedMode}</span>
@@ -32,47 +37,52 @@ const PaymentBankTransferPage = () => {
 
         <div className="pb-7 border-b border-gray-200">
           <div className="flex justify-between mb-[18px]">
-            <p className="text-[14px] text-[#C3C3C3] w-[30%] text-left">일정</p>
-            <p className="text-[14px] text-[#000] w-[70%] text-left">
+            <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">일정</p>
+            <p className="text-[14px] text-[#000] w-[75%] text-left">
               {formatReservationDate(state.selectedDate)}
             </p>
           </div>
 
           <div className="flex justify-between mb-[18px]">
-            <p className="text-[14px] text-[#C3C3C3] w-[30%] text-left">매장 정보</p>
-            <p className="text-[14px] text-[#000] w-[70%] text-left">
-              {state.address}
-              <span className="text-[#0C63D0] cursor-pointer hover:underline" onClick={copyAddress}>
+            <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">매장 정보</p>
+            <p className="text-[14px] text-[#000] w-[75%] text-left">
+              {state.shop_address}
+              <span
+                className="ml-3 text-[#0C63D0] cursor-pointer hover:underline"
+                onClick={copyAddress}
+              >
                 복사
               </span>
             </p>
           </div>
 
-          <div className="flex justify-between mb-[18px]">
-            <p className="text-[14px] text-[#C3C3C3] w-[30%] text-left">결제수단</p>
-            <p className="text-[14px] text-[#000] w-[70%] text-left">계좌이체</p>
+          <div className="flex justify-between mb-[18px] rounded-xl">
+            <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">결제수단</p>
+            <p className="text-[14px] text-[#000] w-[75%] text-left">계좌이체</p>
           </div>
 
           <div className="p-[14px] bg-secondary-100 rounded-lg">
-            <div className="flex justify-between">
-              <p className="text-[14px] text-primary-100 w-[30%]">계좌</p>
-              <p className="text-[14px] text-[#000] w-[70%] text-right">우리은행 1002059617442</p>
+            <div className="flex justify-between mb-2">
+              <p className="text-[14px] text-primary-100 w-[25%]">계좌</p>
+              <p className="text-[14px] text-[#000] w-[75%] text-right">우리은행 1002059617442</p>
             </div>
             <div className="flex justify-between">
-              <p className="text-[14px] text-primary-100 w-[30%]">예금주</p>
-              <p className="text-[14px] text-[#000] w-[70%] text-right">블리스</p>
+              <p className="text-[14px] text-primary-100 w-[25%]">예금주</p>
+              <p className="text-[14px] text-[#000] w-[75%] text-right">블리스</p>
             </div>
           </div>
         </div>
 
         <div className="flex justify-between items-center mt-2">
-          <p className=" text-[#000]">가격</p>
-          <p className=" text-primary-100">{state.servicePrice}</p>
+          <p className="text-sub-title font-bold text-[#000]">가격</p>
+          <p className="text-sub-title font-bold text-primary-100">
+            {Intl.NumberFormat("ko-KR").format(Number(state.servicePrice))}원
+          </p>
         </div>
       </div>
 
       {/* 하단 버튼 */}
-      <div className="min-w-[375px] max-w-[450px] m-auto   p-4 px-6 bg-white border-t mt-8">
+      <div className="min-w-[375px] max-w-[450px] m-auto p-4 px-6 bg-white mt-8">
         <div className="flex gap-3">
           <Button
             variant="outline"
