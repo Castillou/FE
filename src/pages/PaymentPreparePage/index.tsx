@@ -19,14 +19,15 @@ const PaymentPreparePage = () => {
   const handlePrepare = async () => {
     try {
       setLoading(true);
-      const response = await paymentApi.payReady();
-      const reservationId = response._id;
-
+      
       // Format selectedDate as "yyyyMMdd" and append time from reservationTime (expected "HHmm")
       const datePart = selectedDate ? format(selectedDate, "yyyyMMdd") : "";
       // Remove colon from reservationTime to produce "HHmm"
       const timePart = reservationTime.replace(":", "");
       const formattedDate = datePart + timePart;
+      
+      const response = await paymentApi.payReady('67b353c6c220d12e831e63e5', formattedDate);
+      const reservationId = response._id;
 
       // Pass the captured values along with reservationId
       navigate(PATH.payments, {
