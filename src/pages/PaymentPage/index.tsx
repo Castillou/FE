@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getUserMe } from "@/apis/user"; // new import
 import { ReservationCreate } from "@/apis/reservation"; // new import
@@ -10,6 +10,7 @@ import { ConsultingReservationData } from "@/types/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QUERY_KEY from "@/constants/queryKey";
 import { generateShortUuid } from "@/utils/generateUuid";
+import { ReservationCreateRequest } from "@/types/reservation";
 
 const PaymentPage = () => {
   const queryClient = useQueryClient();
@@ -43,6 +44,24 @@ const PaymentPage = () => {
     );
   };
 
+  const invalidateAndRefetchQueries = useCallback(
+    async (userId: string) => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.reservationList.all,
+      });
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEY.reservationList.all,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEY.reservationList.list(userId),
+      });
+      await queryClient.refetchQueries({
+        queryKey: QUERY_KEY.reservationList.list(userId),
+      });
+    },
+    [queryClient]
+  );
+
   const handlePayment = async () => {
     try {
       setLoading(true);
@@ -70,7 +89,7 @@ const PaymentPage = () => {
 
       const shortUuid = generateShortUuid();
 
-      const newReservationData = {
+      const newReservationData: ReservationCreateRequest = {
         reservation_id: shortUuid,
         designer_id: ReservationData.id,
         user_id: user.user_id,
@@ -78,28 +97,15 @@ const PaymentPage = () => {
         consulting_fee: state.servicePrice.toString(),
         google_meet_link: "",
         mode: ReservationData.selectedMode,
-        status: "결제대기",
+        status: selectedMethod === "BANK" ? "결제대기" : "예약완료",
       };
 
-      localStorage.setItem("reservationData", JSON.stringify(newReservationData));
+      await ReservationCreate(newReservationData);
+
+      // 모든 예약 관련 쿼리 무효화
+      await invalidateAndRefetchQueries(user.user_id);
 
       if (selectedMethod === "BANK") {
-        await ReservationCreate(newReservationData);
-
-        // 모든 예약 관련 쿼리 무효화
-        await queryClient.invalidateQueries({
-          queryKey: QUERY_KEY.reservationList.all,
-        });
-        await queryClient.refetchQueries({
-          queryKey: QUERY_KEY.reservationList.all,
-        });
-        await queryClient.invalidateQueries({
-          queryKey: QUERY_KEY.reservationList.list(user.user_id),
-        });
-        await queryClient.refetchQueries({
-          queryKey: QUERY_KEY.reservationList.list(user.user_id),
-        });
-
         navigate(PATH.paymentBankTransfer, { state: ReservationData });
       } else if (selectedMethod === "KAKAO") {
         // 카카오페이 결제 시 디바이스에 따른 리다이렉트

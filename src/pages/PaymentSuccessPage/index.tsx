@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { paymentApi } from "../../services/paymentApi";
 import { PATH } from "@/constants/path";
@@ -6,20 +6,11 @@ import { AxiosError } from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Check } from "lucide-react";
-import devApi from "@/config/axiosDevConfig";
-import { RESERVATION_ENDPOINT } from "@/apis/endpoints";
 import { DesignerDetailResponse } from "@/types/apiTypes";
 import { getDesignerDetail } from "@/apis/designerDetail";
 import { formatReservationDate } from "@/utils/dayFormat";
-import { useQueryClient } from "@tanstack/react-query";
-import QUERY_KEY from "@/constants/queryKey";
-
-interface PaymentInfo {
-  amount: number;
-  reservation_id: string;
-  approved_at: string;
-  user_id: string;
-}
+import { PaymentInfo } from "@/types/payment";
+import { getReservationDetail } from "@/apis/reservationDetail";
 
 interface ReservationPayload {
   reservation_id: string;
@@ -33,7 +24,6 @@ interface ReservationPayload {
 }
 
 const PaymentSuccessPage = () => {
-  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -53,27 +43,27 @@ const PaymentSuccessPage = () => {
     status: "예약완료",
   });
 
-  // 예약 생성 API 호출 함수
-  const handleCreateReservation = useCallback(async (reservationPayload: ReservationPayload) => {
-    try {
-      setLoading(true);
-      const reservationResponse = await devApi.post(
-        RESERVATION_ENDPOINT.create,
-        reservationPayload
-      );
-      console.log("Reservation created:", reservationResponse.data);
-      // 예약 생성 후 success 페이지 처리는 이미 이 페이지 내에서 보여주고 있으므로
-      // 추가로 navigate 처리할 필요가 없을 수 있습니다.
-      setLoading(false);
-    } catch (err: unknown) {
-      if (err instanceof AxiosError) {
-        setError(err.response?.data?.detail || "예약 생성 중 오류가 발생했습니다.");
-      } else {
-        setError("예약 생성 중 오류가 발생했습니다.");
-      }
-      setLoading(false);
-    }
-  }, []);
+  // // 예약 생성 API 호출 함수
+  // const handleCreateReservation = useCallback(async (reservationPayload: ReservationPayload) => {
+  //   try {
+  //     setLoading(true);
+  //     const reservationResponse = await devApi.post(
+  //       RESERVATION_ENDPOINT.create,
+  //       reservationPayload
+  //     );
+  //     console.log("Reservation created:", reservationResponse.data);
+  //     // 예약 생성 후 success 페이지 처리는 이미 이 페이지 내에서 보여주고 있으므로
+  //     // 추가로 navigate 처리할 필요가 없을 수 있습니다.
+  //     setLoading(false);
+  //   } catch (err: unknown) {
+  //     if (err instanceof AxiosError) {
+  //       setError(err.response?.data?.detail || "예약 생성 중 오류가 발생했습니다.");
+  //     } else {
+  //       setError("예약 생성 중 오류가 발생했습니다.");
+  //     }
+  //     setLoading(false);
+  //   }
+  // }, []);
 
   const handlePaymentApproval = async (pg_token: string, tid: string, order_id: string) => {
     try {
@@ -90,47 +80,24 @@ const PaymentSuccessPage = () => {
     }
   };
 
-  const invalidateAndRefetchQueries = useCallback(
-    async (userId: string) => {
-      await queryClient.invalidateQueries({
-        queryKey: QUERY_KEY.reservationList.all,
-      });
-      await queryClient.refetchQueries({
-        queryKey: QUERY_KEY.reservationList.all,
-      });
-      await queryClient.invalidateQueries({
-        queryKey: QUERY_KEY.reservationList.list(userId),
-      });
-      await queryClient.refetchQueries({
-        queryKey: QUERY_KEY.reservationList.list(userId),
-      });
-    },
-    [queryClient]
-  );
+  // useEffect(() => {
+  //   const reservationDataStr = localStorage.getItem("reservationData");
+  //   if (reservationDataStr) {
+  //     const reservationData: ReservationCreateRequest = JSON.parse(reservationDataStr);
+  //     const newReservationPayload = {
+  //       ...reservationData,
+  //       status: "예약완료",
+  //     };
 
-  useEffect(() => {
-    const reservationDataStr = localStorage.getItem("reservationData");
-    if (reservationDataStr) {
-      const reservationData = JSON.parse(reservationDataStr);
-      const newReservationPayload = {
-        ...reservationData,
-        status: "예약완료",
-      };
+  //     setReservationPayload(newReservationPayload);
+  //     handleCreateReservation(newReservationPayload);
 
-      setReservationPayload(newReservationPayload);
-      handleCreateReservation(newReservationPayload);
+  //     invalidateAndRefetchQueries(reservationData.user_id);
 
-      invalidateAndRefetchQueries(reservationData.user_id);
-
-      // 디자이너 정보 가져오기
-      getDesignerDetail(reservationData.designer_id)
-        .then((designerDetail) => setDesignerInfo(designerDetail))
-        .catch(console.error);
-
-      // 사용 후 데이터 삭제
-      localStorage.removeItem("reservationData");
-    }
-  }, [handleCreateReservation, invalidateAndRefetchQueries]);
+  //     // 사용 후 데이터 삭제
+  //     localStorage.removeItem("reservationData");
+  //   }
+  // }, [handleCreateReservation, invalidateAndRefetchQueries]);
 
   useEffect(() => {
     const processPaymentAndReservation = async () => {
@@ -150,6 +117,24 @@ const PaymentSuccessPage = () => {
         // 결제 승인 처리
         const paymentResponse = await handlePaymentApproval(pg_token, tid, order_id);
         setPaymentInfo(paymentResponse);
+
+        const reservationResponse = await getReservationDetail(paymentResponse.reservation_id);
+
+        if (reservationResponse) {
+          setReservationPayload({
+            reservation_id: reservationResponse.id,
+            designer_id: reservationResponse.designer_id,
+            user_id: reservationResponse.user_id,
+            reservation_date_time: reservationResponse.reservation_date_time,
+            consulting_fee: reservationResponse.consulting_fee.toString(),
+            google_meet_link: reservationResponse.google_meet_link,
+            mode: reservationResponse.mode,
+            status: reservationResponse.status,
+          });
+          // 디자이너 정보 가져오기
+          const designerResponse = await getDesignerDetail(reservationResponse.designer_id);
+          setDesignerInfo(designerResponse);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "처리 중 오류가 발생했습니다.");
       } finally {
@@ -159,7 +144,7 @@ const PaymentSuccessPage = () => {
     };
 
     processPaymentAndReservation();
-  }, [searchParams]);
+  }, [reservationPayload.designer_id, searchParams]);
 
   if (loading) {
     return <div className="text-center p-8">처리 중...</div>;
