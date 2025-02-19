@@ -5,17 +5,25 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  // DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
 
-const DeleteUserDialog = ({ onDelete }: { onDelete: () => void }) => (
-  <Dialog>
-    <DialogTrigger asChild>
+const DeleteUserDialog = ({
+  onDelete,
+  open,
+  onOpenChange,
+}: {
+  onDelete: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    {/* <DialogTrigger asChild>
       <button className="w-full bg-gray-scale-100 py-3 text-body1 text-gray-scale-200 rounded-lg">
         회원탈퇴
       </button>
-    </DialogTrigger>
+    </DialogTrigger> */}
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>
@@ -26,7 +34,7 @@ const DeleteUserDialog = ({ onDelete }: { onDelete: () => void }) => (
           </div>
         </DialogTitle>
         <DialogDescription>
-          <div className="text-center text-body1 mb-3">정말로 회원탈퇴 하시겠습니까?</div>
+          <p className="text-center text-body1 mb-3">정말로 회원탈퇴 하시겠습니까?</p>
         </DialogDescription>
       </DialogHeader>
       <DialogFooter>

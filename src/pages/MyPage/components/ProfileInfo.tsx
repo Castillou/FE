@@ -1,38 +1,77 @@
+import { userLogout } from "@/apis/userLogout";
+import { PATH } from "@/constants/path";
 import { UserMeResponse } from "@/types/user";
+import { useNavigate } from "react-router-dom";
+import DeleteUserDialog from "./DeleteUserDialog";
+import { useState } from "react";
 
 interface ProfileInfoProps {
   user: UserMeResponse;
+  handleDeleteUser: () => void;
 }
 
-const ProfileInfo = ({ user }: ProfileInfoProps) => {
+const ProfileInfo = ({ user, handleDeleteUser }: ProfileInfoProps) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const response = await userLogout();
+    if (response.message) {
+      alert("로그아웃 되었습니다.");
+    }
+    navigate(PATH.login);
+  };
+
   return (
     <section>
-      <article className="flex flex-col items-center mb-6">
-        <div className="w-28 h-28 rounded-full overflow-hidden mb-5">
+      <article className="mb-6">
+        <h2 className="text-[24px] font-bold">마이페이지</h2>
+      </article>
+
+      <article className="flex items-center mb-6 gap-[18px]">
+        <div className="w-[72px] h-[72px] rounded-full overflow-hidden">
           <img src={user.profile_image} alt="프로필 이미지" className="size-full object-cover" />
         </div>
         <div>
           <h3 className="text-center text-2xl font-bold">{user.name}</h3>
         </div>
       </article>
-      <article className="mb-8">
-        <h3 className="text-sub-title font-semibold mb-2">관심있는 요소</h3>
-        <ul className="flex gap-2">
-          <li className="px-4 py-1 rounded-full bg-purple-100 text-purple-700">
-            <span>땅콩형 두상</span>
-          </li>
-          <li className="px-4 py-1 rounded-full bg-purple-100 text-purple-700">
-            <span>펌</span>
-          </li>
-        </ul>
-      </article>
-      <article className="mb-8">
-        <h3 className="text-sub-title font-semibold mb-2">자기소개</h3>
-        <div className="w-full bg-gray-scale-100 p-3 text-body1 text-gray-scale-300 rounded-lg">
-          안녕하세요! 헤어에 관심이 많은 18세 할머리입니다. 땅콩형 얼굴에 어울리지 않는 헤어스타일이
-          고민이에요
+
+      <article className="flex items-center justify-evenly mb-6 bg-[#F7F7F7] rounded-lg p-4">
+        <div className="flex flex-col items-center gap-[7px] w-[70px]">
+          <span className="text-[#000] font-bold">0</span>
+          <span className="text-[14px] text-[#676767]">예약</span>
+        </div>
+        <div className="w-[2px] h-[45px] bg-[#D9D9D9]"></div>
+        <div className="flex flex-col items-center gap-[7px] w-[70px]">
+          <span className="text-[#000] font-bold">2</span>
+          <span className="text-[14px] text-[#676767]">관심요소</span>
         </div>
       </article>
+
+      <div className="w-full h-2 bg-[#F2F1F6]"></div>
+
+      <article className="mb-8">
+        <div className="py-[18px] border-b border-selected-default">
+          <span onClick={handleLogout} className="text-[14px] text-[#676767] cursor-pointer">
+            로그아웃
+          </span>
+        </div>
+        <div className="py-[18px] border-b border-selected-default">
+          <span
+            onClick={() => setIsDeleteDialogOpen(true)}
+            className="text-[14px] text-[#676767] cursor-pointer"
+          >
+            회원탈퇴
+          </span>
+        </div>
+      </article>
+
+      <DeleteUserDialog
+        onDelete={handleDeleteUser}
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      />
     </section>
   );
 };

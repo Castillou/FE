@@ -1,17 +1,8 @@
-import { userLogout } from "@/apis/userLogout";
-import { PATH } from "@/constants/path";
 import { useNavigate } from "react-router-dom";
 
 const MyPageHeader = () => {
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    const response = await userLogout();
-    if (response.message) {
-      alert("로그아웃 되었습니다.");
-    }
-    navigate(PATH.login);
-  };
   return (
     <header className="flex items-center justify-between mb-5">
       <div onClick={() => navigate(-1)}>
@@ -31,9 +22,6 @@ const MyPageHeader = () => {
           />
         </svg>
       </div>
-      <button onClick={handleLogout} className="text-gray-scale-300">
-        로그아웃
-      </button>
     </header>
   );
 };

@@ -2,7 +2,6 @@ import { userDelete } from "@/apis/userDelete";
 import { useNavigate } from "react-router-dom";
 import MyPageHeader from "./components/MyPageHeader";
 import ProfileInfo from "./components/ProfileInfo";
-import DeleteUserDialog from "./components/DeleteUserDialog";
 import { useQuery } from "@tanstack/react-query";
 import QUERY_KEY from "@/constants/queryKey";
 import { getUserMe } from "@/apis/user";
@@ -90,9 +89,8 @@ const MyPage = () => {
     <div className="pt-8 px-8 pb-5 flex flex-col justify-between min-h-[calc(100vh-64px)]">
       <div>
         <MyPageHeader />
-        <ProfileInfo user={data} />
+        <ProfileInfo user={data} handleDeleteUser={handleDeleteUser} />
       </div>
-      <DeleteUserDialog onDelete={handleDeleteUser} />
     </div>
   );
 };
