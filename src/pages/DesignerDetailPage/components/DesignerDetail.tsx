@@ -91,7 +91,10 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
           <div className="px-5 pt-[25px] bg-white">
             <div className="flex justify-between items-center mb-[12px]">
               <div>
-                <p className="text-[20px] font-bold mb-[6px]">{data?.name}</p>
+                <div className="mb-2">
+                  <span className="font-bold text-[24px]">{data?.name?.split(" ")[0]} </span>
+                  <span className="font-semibold text-[20px]">{data?.name?.split(" ")[1]}</span>
+                </div>
                 <p className="text-[14px] text-[#676767]">{data?.introduction}</p>
               </div>
               <img
@@ -204,7 +207,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
               </DialogContent>
             </Dialog>
 
-            <div>
+            <div className="fixed bottom-4 left-0 right-0 w-[80%] m-auto min-w-[355px] max-w-[410px]">
               <Button
                 className="bg-primary-200 text-white w-full text-[20px] font-bold py-[14px] h-[50px] transition-colors duration-200 hover:bg-primary-300"
                 onClick={() => setOpen(true)}
@@ -225,10 +228,10 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
               <div className="flex flex-col gap-[10px] mb-1">
                 {availableModes?.includes("대면") ? (
                   <div
-                    className={`p-3 cursor-pointer rounded-md border ${
+                    className={`p-3 cursor-pointer rounded-xl border ${
                       reservationData?.selectedMode === "대면"
-                        ? "border border-primary-100 bg-secondary-100"
-                        : "bg-[#F0F0F0]"
+                        ? "border border-primary-100 bg-secondary-100 opacity-100"
+                        : "bg-[#F0F0F0] opacity-50 border-gray-scale-300"
                     }`}
                     onClick={() => {
                       handleModeSelect("대면");
@@ -245,7 +248,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
                 ) : (
                   <div
                     className={
-                      "p-3 min-h-[65px] cursor-pointer bg-[#F0F0F0] flex items-center rounded-md"
+                      "p-3 min-h-[65px] cursor-pointer bg-[#F0F0F0] flex items-center rounded-xl"
                     }
                   >
                     <span className="text-[14px] font-bold">비대면만 가능합니다</span>
@@ -254,10 +257,10 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
 
                 {availableModes?.includes("비대면") ? (
                   <div
-                    className={`p-3 cursor-pointer rounded-md border ${
+                    className={`p-3 cursor-pointer rounded-xl border ${
                       reservationData?.selectedMode === "비대면"
-                        ? "border border-primary-100 bg-secondary-100"
-                        : "bg-[#F0F0F0]"
+                        ? "border border-primary-100 bg-secondary-100 opacity-100"
+                        : "bg-[#F0F0F0] opacity-50 border-gray-scale-300"
                     }`}
                     onClick={() => {
                       handleModeSelect("비대면");
@@ -274,7 +277,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
                 ) : (
                   <div
                     className={
-                      "p-3 min-h-[65px] cursor-pointer bg-[#F0F0F0] flex items-center rounded-md"
+                      "p-3 min-h-[65px] cursor-pointer bg-[#F0F0F0] flex items-center rounded-xl"
                     }
                   >
                     <span className="text-[14px] font-bold">대면만 가능합니다</span>
@@ -282,9 +285,9 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
                 )}
               </div>
 
-              <DrawerFooter className="h-[88px] bg-white">
+              <DrawerFooter className="h-[88px] bg-white px-0">
                 <Button
-                  className="bg-primary-200 text-white w-full text-[20px] font-bold py-[14px] h-[50px] transition-colors duration-200 hover:bg-primary-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="w-full rounded-xl bg-primary-100 text-white text-[20px] font-bold py-[14px] h-[50px] transition-colors duration-200 hover:bg-primary-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
                   disabled={!reservationData?.selectedMode}
                   onClick={goToReservation}
                 >

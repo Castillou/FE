@@ -27,7 +27,7 @@ const router = createBrowserRouter([
       },
       {
         path: "",
-        element: <HomeLayout />,
+        element: <HomeLayout noFooter={location.pathname.includes("/designer/")} />,
         children: [...DESIGNER_ROUTES, ...PAYMENTS_ROUTES, ...RESERVATION_ROUTES, ...MYPAGE_ROUTES],
       },
     ],

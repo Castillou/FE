@@ -29,6 +29,8 @@ const timeSlots = [
       "18:00",
       "18:30",
       "19:00",
+      "19:30",
+      "20:00",
     ],
   },
 ];
@@ -69,7 +71,6 @@ const ReservationPrepare = () => {
       )
       .map((reservation) => dayjs(reservation.reservation_date_time).format("HH:mm"));
 
-    console.log(reservationList);
     // 오늘 날짜인 경우 현재 시간 이전의 시간을 disabled 처리
     const disabledTimes = isToday
       ? timeSlots

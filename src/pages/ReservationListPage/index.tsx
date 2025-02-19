@@ -7,6 +7,7 @@ import { getUserMe } from "@/apis/user";
 import { Toaster } from "@/components/ui/toaster";
 import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
+import MyPageHeader from "../MyPage/components/MyPageHeader";
 
 const ReservationListPage = () => {
   const {
@@ -86,7 +87,10 @@ const ReservationListPage = () => {
   return (
     <div className="flex flex-col justify-between min-h-[calc(100vh-64px)]">
       <div>
-        <h2 className="pt-8 px-8 text-xl font-bold mb-4">예약 내역</h2>
+        <div className="pt-8 px-8">
+          <MyPageHeader />
+          <h2 className=" text-xl font-bold mb-4">예약 내역</h2>
+        </div>
         {renderContent()}
       </div>
       <div>

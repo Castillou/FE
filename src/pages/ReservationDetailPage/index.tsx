@@ -6,6 +6,7 @@ import ImageSection from "./components/ImageSection";
 import { useParams } from "react-router-dom";
 import { Reservation } from "@/types/apiTypes";
 import { getDesignerDetail } from "@/apis/designerDetail";
+import MyPageHeader from "../MyPage/components/MyPageHeader";
 
 const ReservationDetailContent = ({ data }: { data: Reservation | undefined }) => {
   const {
@@ -72,6 +73,7 @@ const ReservationDetailPage = () => {
 
   return (
     <div className="pt-8 px-8 pb-5">
+      <MyPageHeader />
       <h2 className="text-xl font-bold mb-4">예약 상세정보</h2>
       <ReservationDetailContent data={data} />
     </div>

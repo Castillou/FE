@@ -28,7 +28,7 @@ const PaymentBankTransferPage = () => {
       </header>
 
       <div className="px-6">
-        <div className="flex items-center gap-4 mb-3 pt-6 border-t border-gray-200">
+        <div className="flex items-center gap-4 mb-5 pt-6 border-t border-gray-200">
           <p className="text-[20px] font-bold">{state.name}</p>
           <div className="bg-secondary-100 rounded-full px-3 py-[2px] whitespace-nowrap">
             <span className="text-[12px] text-primary-300">{state.selectedMode}</span>

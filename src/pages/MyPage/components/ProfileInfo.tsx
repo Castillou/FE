@@ -4,7 +4,9 @@ import { UserMeResponse } from "@/types/user";
 import { useNavigate } from "react-router-dom";
 import DeleteUserDialog from "./DeleteUserDialog";
 import { useState } from "react";
-
+import { useQuery } from "@tanstack/react-query";
+import QUERY_KEY from "@/constants/queryKey";
+import { getReservationList } from "@/apis/reservation";
 interface ProfileInfoProps {
   user: UserMeResponse;
   handleDeleteUser: () => void;
@@ -21,6 +23,11 @@ const ProfileInfo = ({ user, handleDeleteUser }: ProfileInfoProps) => {
     }
     navigate(PATH.login);
   };
+
+  const { data: reservationList } = useQuery({
+    queryKey: QUERY_KEY.reservationList.list(user.user_id),
+    queryFn: () => getReservationList(user.user_id),
+  });
 
   return (
     <section>
@@ -39,7 +46,8 @@ const ProfileInfo = ({ user, handleDeleteUser }: ProfileInfoProps) => {
 
       <article className="flex items-center justify-evenly mb-6 bg-[#F7F7F7] rounded-lg p-4">
         <div className="flex flex-col items-center gap-[7px] w-[70px]">
-          <span className="text-[#000] font-bold">0</span>
+          <span className="text-[#000] font-bold">{reservationList?.length}</span>
+
           <span className="text-[14px] text-[#676767]">예약</span>
         </div>
         <div className="w-[2px] h-[45px] bg-[#D9D9D9]"></div>

@@ -15,7 +15,7 @@ const DesignerItem = ({ designer }: DesignerItemProps) => {
       className="bg-white px-7 cursor-pointer"
       onClick={() => navigate(PATH.designerDetail(designer.id))}
     >
-      <article className="w-full border-b  mt-4 border-gray-200 py-[22px] flex justify-between">
+      <article className="w-full border-b border-gray-200 py-[22px] flex justify-between">
         <div className="flex flex-col justify-between">
           <div>
             <p className="text-[11px] mb-2 text-[#737373]">{designer.region}</p>

@@ -3,23 +3,17 @@ import { useEffect } from "react";
 
 const useAxiosInterceptor = (instance: AxiosInstance) => {
   const onRequest = (config: InternalAxiosRequestConfig) => {
-    if (import.meta.env.MODE === "development") {
-      console.log(`요청 API : ${config.method?.toUpperCase()} ${config.url}`);
-    }
     return config;
   };
 
   const onRequestError = (error: AxiosError) => {
     if (import.meta.env.MODE === "development") {
-      console.log(`요청 API 오류 : ${error.message}`);
+      console.error(`요청 API 오류 : ${error.message}`);
     }
     return Promise.reject(error);
   };
 
   const onResponse = (response: AxiosResponse) => {
-    if (import.meta.env.MODE === "development") {
-      console.log(`응답 API : ${response.config.method?.toUpperCase()} ${response.config.url}`);
-    }
     return response;
   };
 

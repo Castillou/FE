@@ -12,13 +12,13 @@ const queryClient = new QueryClient({
   },
 });
 
-export default function HomeLayout() {
+export default function HomeLayout({ noFooter }: { noFooter: boolean }) {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-w-[350px] max-w-[450px] pb-24 min-h-dvh m-auto">
         <div className="font-sans">
           <Outlet />
-          <Footer />
+          {!noFooter && <Footer />}
         </div>
       </div>
     </QueryClientProvider>
