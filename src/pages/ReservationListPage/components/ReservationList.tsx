@@ -93,7 +93,9 @@ const ReservationList = ({ list }: ReservationListProps) => {
         </ul>
       </TabsContent>
 
-      {list.length === 0 && <div>아직 이용한 예약이 없어요!</div>}
+      {list.length === 0 && (
+        <div className="text-center text-gray-600">아직 이용한 예약이 없어요!</div>
+      )}
     </Tabs>
   );
 };

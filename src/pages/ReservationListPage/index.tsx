@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import MyPageHeader from "../MyPage/components/MyPageHeader";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const ReservationListPage = () => {
   const {
@@ -59,46 +60,50 @@ const ReservationListPage = () => {
         });
       }
     }
-  }, [userIsError, userError, toast]);
+  }, [reservationError?.message, reservationIsError, userError?.message, userIsError]);
 
-  const renderContent = () => {
-    if ((userIsPending || reservationIsPending) && !userIsError && !reservationIsError) {
-      return (
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">로딩중...</p>
-        </div>
-      );
-    }
+  let content = null;
 
-    if (userIsError || reservationIsError) {
-      return (
-        <div className=" p-8">
-          <h2 className="text-lg font-semibold mb-2">데이터를 불러오지 못했습니다.</h2>
-          <p className="text-gray-600">
-            예약 목록을 불러오지 못했습니다. 잠시 후에 다시 시도해주세요.
-          </p>
-        </div>
-      );
-    }
+  if (userIsPending || reservationIsPending) {
+    content = <LoadingSpinner text="예약 목록을 불러오는 중..." />;
+  }
 
-    return <ReservationList list={reservations ?? []} />;
-  };
+  if (userIsError || reservationIsError) {
+    content = (
+      <div className=" p-8">
+        <h2 className="text-lg font-semibold mb-2">데이터를 불러오지 못했습니다.</h2>
+        <p className="text-gray-600">
+          예약 목록을 불러오지 못했습니다. 잠시 후에 다시 시도해주세요.
+        </p>
+      </div>
+    );
+  }
 
-  return (
-    <div className="flex flex-col justify-between min-h-[calc(100vh-64px)]">
+  if (reservations && reservations.length === 0) {
+    content = (
+      <div className="p-8">
+        <h2 className="text-lg font-semibold mb-2">예약 내역이 없습니다.</h2>
+      </div>
+    );
+  }
+
+  content = (
+    <>
       <div>
         <div className="pt-8 px-8">
           <MyPageHeader />
           <h2 className=" text-xl font-bold mb-4">예약 내역</h2>
         </div>
-        {renderContent()}
+        <ReservationList list={reservations ?? []} />
       </div>
       <div>
         <Footer />
         <Toaster />
       </div>
-    </div>
+    </>
   );
+
+  return <div className="flex flex-col justify-between min-h-[calc(100vh-64px)]">{content}</div>;
 };
 
 export default ReservationListPage;

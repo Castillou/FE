@@ -11,6 +11,7 @@ import QUERY_KEY from "@/constants/queryKey";
 import { generateShortUuid } from "@/utils/generateUuid";
 import { ReservationCreateRequest } from "@/types/reservation";
 import { ReservationCreate } from "@/apis/reservation";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const PaymentPage = () => {
   const queryClient = useQueryClient();
@@ -81,6 +82,7 @@ const PaymentPage = () => {
   const handlePayment = async () => {
     try {
       setLoading(true);
+      setError(null);
 
       if (!user) {
         setError("로그인이 필요합니다.");
@@ -150,7 +152,11 @@ const PaymentPage = () => {
           });
         } catch (bankError) {
           console.error("계좌이체 처리 중 오류:", bankError);
-          setError("계좌이체 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+          setError(
+            `계좌이체 처리 중 오류가 발생했습니다: ${
+              bankError instanceof Error ? bankError.message : "알 수 없는 오류"
+            }`
+          );
           setLoading(false);
           return;
         }
@@ -164,15 +170,15 @@ const PaymentPage = () => {
         return;
       }
     } catch (error) {
-      console.error("예약 실패:", error);
-      setError("예약에 실패했습니다. 다시 시도해주세요.");
+      console.error("결제 처리 중 오류:", error);
+      setError(error instanceof Error ? error.message : "결제 처리 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <div className="text-center p-8">결제 준비중...</div>;
+    return <LoadingSpinner text="결제 준비중..." />;
   }
 
   return (

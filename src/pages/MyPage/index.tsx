@@ -8,6 +8,7 @@ import { getUserMe } from "@/apis/user";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -43,16 +44,7 @@ const MyPage = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="pt-8 px-8 pb-5 flex flex-col justify-between min-h-[calc(100vh-64px)]">
-        <div>
-          <MyPageHeader />
-          <div className="mt-8 text-center">
-            <p className="text-gray-600">로딩중...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner text="사용자 정보를 불러오는 중..." />;
   }
 
   if (isError) {
