@@ -3,8 +3,8 @@ import { Reservation } from "@/types/apiTypes";
 import ReservationItem from "./ReservationItem";
 import dayjs from "dayjs"; // dayjs 라이브러리 사용
 import { useEffect } from "react";
-import { updateReservationStatus } from "@/apis/reservation";
 
+import { reservationCancel } from "@/apis/reservationCancel";
 interface ReservationListProps {
   list: Reservation[];
 }
@@ -23,7 +23,7 @@ const ReservationList = ({ list }: ReservationListProps) => {
       );
 
       for (const reservation of expiredWaitingReservations) {
-        await updateReservationStatus(reservation.id, "예약취소");
+        await reservationCancel(reservation.id);
       }
     };
 

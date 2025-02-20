@@ -35,7 +35,7 @@ export const RESERVATION_ENDPOINT: ReservationEndpoint = Object.freeze({
   get_list: (user_Id: string) => `/reservation/get_list?user_id=${user_Id}`, // 사용자 예약 내역 조회
   get_detail: (reservation_Id: string) =>
     `/reservation/get_detail?reservation_id=${reservation_Id}`, // 예약 상세 정보 조회
-  cancel: (reservation_Id: string) => `/reservation/cancel?reservation_id=${reservation_Id}`, // 예약 취소
+  cancel: (reservation_id: string) => `/reservation/cancel?reservation_id=${reservation_id}`, // 예약 취소
   generateGoogleMeet: (reservation_Id: string) =>
     `/reservation/generate_google_meet_link?reservation_id=${reservation_Id}`, // 구글밋 생성
   create: "/reservation/create", // 예약 생성

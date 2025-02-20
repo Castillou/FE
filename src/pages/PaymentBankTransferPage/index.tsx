@@ -43,18 +43,29 @@ const PaymentBankTransferPage = () => {
             </p>
           </div>
 
-          <div className="flex justify-between mb-[18px]">
-            <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">매장 정보</p>
-            <p className="text-[14px] text-[#000] w-[75%] text-left">
-              {state.shop_address}
-              <span
-                className="ml-3 text-[#0C63D0] cursor-pointer hover:underline"
-                onClick={copyAddress}
-              >
-                복사
-              </span>
-            </p>
-          </div>
+          {state.mode === "비대면" ? (
+            <div className="flex justify-between items-center mb-[18px]">
+              <span className="w-[25%] text-[14px] text-[#C3C3C3]">컨설팅 링크</span>
+              <div className="w-[75%]">
+                <button className="flex justify-center items-center px-5 py-2 text-white bg-[#C3C3C3] rounded-full">
+                  예약 30분 전 활성화됩니다
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex justify-between mb-[18px]">
+              <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">매장 정보</p>
+              <p className="text-[14px] text-[#000] w-[75%] text-left">
+                {state.shop_address || "매장 정보 없음"}
+                <span
+                  className="ml-3 text-[#0C63D0] cursor-pointer hover:underline"
+                  onClick={copyAddress}
+                >
+                  복사
+                </span>
+              </p>
+            </div>
+          )}
 
           <div className="flex justify-between mb-[18px] rounded-xl">
             <p className="text-[14px] text-[#C3C3C3] w-[25%] text-left">결제수단</p>
