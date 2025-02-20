@@ -207,7 +207,7 @@ const DesignerDetail = ({ id }: DesignerDetailProps) => {
               </DialogContent>
             </Dialog>
 
-            <div className="fixed bottom-4 left-0 right-0 w-[80%] m-auto min-w-[355px] max-w-[410px]">
+            <div className="fixed bottom-24 left-0 right-0 w-[80%] m-auto min-w-[355px] max-w-[410px]">
               <Button
                 className="bg-primary-200 text-white w-full text-[20px] font-bold py-[14px] h-[50px] transition-colors duration-200 hover:bg-primary-300"
                 onClick={() => setOpen(true)}
