@@ -120,12 +120,40 @@ const PaymentPage = () => {
       localStorage.setItem("reservation_id", shortUuid);
 
       if (selectedMethod === "BANK") {
-        const reservationCreateResponse = await ReservationCreate(newReservationData);
+        try {
+          // 예약 생성 요청
+          const reservationCreateResponse = await ReservationCreate(newReservationData);
 
-        // 모든 예약 관련 쿼리 무효화
-        await invalidateAndRefetchQueries(reservationCreateResponse.user_id);
+          if (!reservationCreateResponse) {
+            throw new Error("예약 생성에 실패했습니다.");
+          }
 
-        navigate(PATH.paymentBankTransfer, { state: ReservationData });
+          // 쿼리 무효화 및 새로고침
+          try {
+            await invalidateAndRefetchQueries(reservationCreateResponse.user_id);
+          } catch (queryError) {
+            console.error("쿼리 갱신 중 오류:", queryError);
+            // 쿼리 갱신 실패는 크리티컬한 에러가 아니므로 계속 진행
+          }
+
+          // state 데이터 정리
+          const transferPageState = {
+            ...ReservationData,
+            reservation_id: shortUuid,
+            amount: state.servicePrice,
+          };
+
+          // 페이지 이동
+          navigate(PATH.paymentBankTransfer, {
+            state: transferPageState,
+            replace: true, // history 스택 관리를 위해 replace 사용
+          });
+        } catch (bankError) {
+          console.error("계좌이체 처리 중 오류:", bankError);
+          setError("계좌이체 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+          setLoading(false);
+          return;
+        }
       } else if (selectedMethod === "KAKAO") {
         // 카카오페이 결제 시 디바이스에 따른 리다이렉트
         const redirectUrl = isMobile()
