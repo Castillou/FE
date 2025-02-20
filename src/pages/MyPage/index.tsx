@@ -55,7 +55,7 @@ const MyPage = () => {
           <div className="mt-8">
             <h2 className="text-lg font-semibold mb-2">데이터를 불러오지 못했습니다.</h2>
             <p className="text-gray-600">
-              예약 상세 정보를 불러오지 못했습니다. 잠시 후에 다시 시도해주세요.
+              유저 정보를 불러오지 못했습니다. 잠시 후에 다시 시도해주세요.
             </p>
           </div>
         </div>
