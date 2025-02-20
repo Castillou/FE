@@ -6,7 +6,7 @@ import {
   ReservationUpdateResponse,
 } from "@/types/reservation";
 
-export const getReservationList = async (user_id: string) => {
+export const getReservationList = async (user_id: string | undefined) => {
   try {
     const response = await devApi.post(RESERVATION_ENDPOINT.get_list(user_id));
     return response.data;

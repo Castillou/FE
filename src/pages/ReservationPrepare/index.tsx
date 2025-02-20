@@ -1,14 +1,16 @@
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import ReservationPrepareHeader from "./components/ReservationPrepareHeader";
-import { ReservationList } from "@/apis/reservation";
+import { getReservationList, ReservationList } from "@/apis/reservation";
 import dayjs from "dayjs";
 import { DesignerReservationList } from "@/types/apiTypes";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { PATH } from "@/constants/path";
 import { ReservationData } from "@/types/types";
-
+import { getUserMe } from "@/apis/user";
+import { UserMeResponse } from "@/types/user";
+import { ReservationDetailResponse } from "@/types/reservation";
 const timeSlots = [
   { label: "오전", slots: ["10:00", "10:30", "11:00", "11:30"] },
   {
@@ -43,6 +45,7 @@ const ReservationPrepare = () => {
   const reservationData: ReservationData = state.reservationData;
   const navigate = useNavigate();
   const [isChecked, setIsChecked] = useState(false);
+  const [userReservationList, setUserReservationList] = useState<ReservationDetailResponse[]>([]);
 
   const servicePrice =
     reservationData?.selectedMode === "대면"
@@ -83,7 +86,17 @@ const ReservationPrepare = () => {
           })
       : [];
 
-    return [...reservedTimes, ...disabledTimes];
+    console.log(userReservationList);
+
+    const userReservedTimes = userReservationList
+      ?.filter(
+        (reservation) =>
+          (reservation.status === "예약완료" || reservation.status === "결제대기") &&
+          dayjs(reservation.reservation_date_time).format("YYYY-MM-DD") ===
+            dayjs(date).format("YYYY-MM-DD")
+      )
+      .map((reservation) => dayjs(reservation.reservation_date_time).format("HH:mm"));
+    return [...reservedTimes, ...disabledTimes, ...userReservedTimes];
   };
 
   const disabledTimes = getDisabledTimes();
@@ -121,6 +134,23 @@ const ReservationPrepare = () => {
       },
     });
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userResponse: UserMeResponse = await getUserMe();
+
+        if (userResponse?.user_id) {
+          const reservationResponse = await getReservationList(userResponse.user_id);
+          setUserReservationList(reservationResponse);
+        }
+      } catch (error) {
+        console.error("데이터 불러오기 실패:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const fetchReservationList = async () => {
