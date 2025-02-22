@@ -19,6 +19,7 @@ const PaymentPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedMethod, setSelectedMethod] = useState<"BANK" | "KAKAO" | null>(null);
+  const [reservationId, setReservationId] = useState<string>("");
   const { state } = useLocation();
   const ReservationData: ConsultingReservationData = state;
   const navigate = useNavigate();
@@ -62,7 +63,10 @@ const PaymentPage = () => {
   useEffect(() => {
     const checkReservationAvailability = async () => {
       try {
-        await paymentApi.payReady(ReservationData.id, formatReverseDate(state.selectedDate));
+        // 단순 조회가 아닌 reservationId 생성 (중복생성방지)
+        // await paymentApi.payReady(ReservationData.id, formatReverseDate(state.selectedDate));
+        const response = await paymentApi.payReady(ReservationData.id, formatReverseDate(state.selectedDate));
+        setReservationId(response._id);
       } catch (error) {
         console.error("예약 준비 중 오류가 발생했습니다.", error);
         alert("해당 일시에 예약이 이미 존재합니다.");
@@ -84,6 +88,7 @@ const PaymentPage = () => {
       setLoading(true);
       setError(null);
 
+      // 토큰으로 확인해야 할 듯..?
       if (!user) {
         setError("로그인이 필요합니다.");
         return;
@@ -94,10 +99,14 @@ const PaymentPage = () => {
         return;
       }
 
-      const shortUuid = generateShortUuid();
-
+      // const shortUuid = generateShortUuid();
+      if (!reservationId) {
+        setError("예약 준비 중 오류가 발생했습니다.");
+        return;
+      }      
       const readyResponse = await paymentApi.ready({
-        reservation_id: shortUuid,
+        // reservation_id: shortUuid,
+        reservation_id: reservationId, 
         user_id: user.user_id,
         payment_method: selectedMethod === "BANK" ? "BANK" : "KAKAO_PAY",
         amount: state.servicePrice,
@@ -108,7 +117,8 @@ const PaymentPage = () => {
       localStorage.setItem("order_id", readyResponse.payment_id);
 
       const newReservationData: ReservationCreateRequest = {
-        reservation_id: shortUuid,
+        // reservation_id: shortUuid,
+        reservation_id: reservationId,
         designer_id: ReservationData.id,
         user_id: user.user_id,
         reservation_date_time: formatReverseDate(state.selectedDate),
@@ -119,7 +129,7 @@ const PaymentPage = () => {
       };
 
       localStorage.setItem("reservation", JSON.stringify(newReservationData));
-      localStorage.setItem("reservation_id", shortUuid);
+      localStorage.setItem("reservation_id", reservationId);
 
       if (selectedMethod === "BANK") {
         try {
@@ -141,7 +151,8 @@ const PaymentPage = () => {
           // state 데이터 정리
           const transferPageState = {
             ...ReservationData,
-            reservation_id: shortUuid,
+            // reservation_id: shortUuid,
+            reservation_id: reservationId,
             amount: state.servicePrice,
           };
 
