@@ -2,13 +2,11 @@ import { useCallback, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getUserMe } from "@/apis/user"; // new import
 import { paymentApi } from "../../services/paymentApi";
-// import { Card, CardContent } from "@/components/ui/card";
 import { PATH } from "@/constants/path";
 import { formatReservationDate, formatReverseDate } from "@/utils/dayFormat";
 import { ConsultingReservationData } from "@/types/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import QUERY_KEY from "@/constants/queryKey";
-import { generateShortUuid } from "@/utils/generateUuid";
 import { ReservationCreateRequest } from "@/types/reservation";
 import { ReservationCreate } from "@/apis/reservation";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -65,7 +63,10 @@ const PaymentPage = () => {
       try {
         // 단순 조회가 아닌 reservationId 생성 (중복생성방지)
         // await paymentApi.payReady(ReservationData.id, formatReverseDate(state.selectedDate));
-        const response = await paymentApi.payReady(ReservationData.id, formatReverseDate(state.selectedDate));
+        const response = await paymentApi.payReady(
+          ReservationData.id,
+          formatReverseDate(state.selectedDate)
+        );
         setReservationId(response._id);
       } catch (error) {
         console.error("예약 준비 중 오류가 발생했습니다.", error);
@@ -103,10 +104,10 @@ const PaymentPage = () => {
       if (!reservationId) {
         setError("예약 준비 중 오류가 발생했습니다.");
         return;
-      }      
+      }
       const readyResponse = await paymentApi.ready({
         // reservation_id: shortUuid,
-        reservation_id: reservationId, 
+        reservation_id: reservationId,
         user_id: user.user_id,
         payment_method: selectedMethod === "BANK" ? "BANK" : "KAKAO_PAY",
         amount: state.servicePrice,
